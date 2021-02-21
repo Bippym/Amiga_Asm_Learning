@@ -1,11 +1,21 @@
 	IFND	GRAPHICS_SPRITE_I
-GRAPHICS_SPRITE_I	=	1
-	RSRESET
-SimpleSprite	RS.B	0
-ss_posctldata	RS.L	1
-ss_height	RS.W	1
-ss_x		RS.W	1
-ss_y		RS.W	1
-ss_num		RS.W	1
-ss_SIZEOF	RS.W	0
-	ENDC
+GRAPHICS_SPRITE_I	SET	1
+**
+**	$Filename: graphics/sprite.i $
+**	$Release: 1.3 $
+**
+**	
+**
+**	(C) Copyright 1985,1986,1987,1988 Commodore-Amiga, Inc.
+**	    All Rights Reserved
+**
+
+   STRUCTURE   SimpleSprite,0
+   APTR	       ss_posctldata
+   WORD	       ss_height
+   WORD	       ss_x
+   WORD	       ss_y
+   WORD	       ss_num
+   LABEL       ss_SIZEOF
+
+	ENDC	; GRAPHICS_SPRITE_I

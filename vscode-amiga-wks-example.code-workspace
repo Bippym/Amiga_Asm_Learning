@@ -33,6 +33,7 @@
 			"includes": "**/*",
 			"excludes": "**/.*"
 		},
-		"editor.formatOnSave": true
+		"editor.formatOnSave": true,
+		"C_Cpp.default.compilerPath": "c:\\Users\\Bippy\\.vscode\\extensions\\bartmanabyss.amiga-debug-1.0.0\\bin\\opt\\bin\\m68k-amiga-elf-gcc.exe"
 	}
 }

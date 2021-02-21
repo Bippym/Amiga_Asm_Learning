@@ -1,40 +1,51 @@
 	IFND	GRAPHICS_LAYERS_I
-GRAPHICS_LAYERS_I	=	1
-	IFND	EXEC_SEMAPHORES_I
-	INCLUDE	exec/semaphores.i
-	ENDC
-	IFND	EXEC_LISTS_I
-	INCLUDE	exec/lists.i
-	ENDC
-	RSRESET
-LayerInfo_extra	RS.B	0
-lie_env		RS.B	13*4
-lie_mem		RS.B	LH_SIZE
-lie_SIZEOF	RS.W	0
-LAYERSIMPLE	=	1
-LAYERSMART	=	2
-LAYERSUPER	=	4
-LAYERUPDATING	=	$10
-LAYERBACKDROP	=	$40
-LAYERREFRESH	=	$80
-LAYER_CLIPRECTS_LOST=	$100
-LMN_REGION	=	-1
-	RSRESET
-Layer_Info		RS.B	0
-li_top_layer		RS.L	1
-li_check_lp		RS.L	1
-li_obs			RS.L	1
-li_FreeClipRects	RS.B	MLH_SIZE
-li_Lock			RS.B	SS_SIZE
-li_gs_Head		RS.B	LH_SIZE
-li_long_reserved	RS.L	1
-li_Flags		RS.W	1
-li_fatten_count		RS.B	1
-li_LockLayersCount	RS.B	1
-li_LayerInfo_extra_size	RS.W	1
-li_blitbuff		RS.L	1
-li_LayerInfo_extra	RS.L	1
-li_SIZEOF		RS.W	0
-NEWLAYERINFO_CALLED	=	1
-ALERTLAYERSNOMEM	=	$83010000
-	ENDC
+GRAPHICS_LAYERS_I	SET	1
+**
+**	$Filename: graphics/layers.i $
+**	$Release: 1.3 $
+**
+**	
+**
+**	(C) Copyright 1985,1986,1987,1988 Commodore-Amiga, Inc.
+**	    All Rights Reserved
+**
+
+    IFND    EXEC_SEMAPHORES_I
+       include "exec/semaphores.i"
+    ENDC
+
+    IFND  EXEC_LISTS_I
+       include	"exec/lists.i"
+    ENDC
+
+* these should be clip.i/h but you know backwards compatibility etc.
+LAYERSIMPLE		equ   1
+LAYERSMART		equ   2	 
+LAYERSUPER		equ   4
+LAYERUPDATING		equ   $10
+LAYERBACKDROP		equ   $40
+LAYERREFRESH		equ   $80
+LAYER_CLIPRECTS_LOST	equ   $100 
+
+LMN_REGION  equ -1
+
+    STRUCTURE  Layer_Info,0
+    APTR       li_top_layer
+    APTR       li_check_lp
+    APTR       li_obs
+    STRUCT     li_FreeClipRects,MLH_SIZE
+    STRUCT     li_Lock,SS_SIZE
+	STRUCT	   li_gs_Head,LH_SIZE
+	LONG		li_long_reserved
+	WORD	   li_Flags
+    BYTE       li_fatten_count
+	BYTE	   li_LockLayersCount
+    WORD       li_LayerInfo_extra_size
+	APTR		li_blitbuff
+    APTR       li_LayerInfo_extra
+    LABEL      li_SIZEOF
+
+NEWLAYERINFO_CALLED	equ 1
+ALERTLAYERSNOMEM	equ $83010000
+
+	ENDC	; GRAPHICS_LAYERS_I

@@ -1,12 +1,12 @@
 	IFND	HARDWARE_CIA_I
 HARDWARE_CIA_I	SET	1
 **
-**	$VER: cia.i 39.1 (18.9.92)
-**	Includes Release 40.13
+**	$Filename: hardware/cia.i $
+**	$Release: 1.3 $
 **
-**	registers and bits in the Complex Interface Adapter (CIA) chip
+**	registers and bits in the Complex Interface Adapter (CIA) chip 
 **
-**	(C) Copyright 1985-1993 Commodore-Amiga, Inc.
+**	(C) Copyright 1985,1986,1987,1988 Commodore-Amiga, Inc.
 **	    All Rights Reserved
 **
 
@@ -23,12 +23,12 @@ HARDWARE_CIA_I	SET	1
 * cia register offsets
 ciapra		  EQU	$0000
 ciaprb		  EQU	$0100
-ciaddra	  EQU	$0200
-ciaddrb	  EQU	$0300
-ciatalo	  EQU	$0400
-ciatahi	  EQU	$0500
-ciatblo	  EQU	$0600
-ciatbhi	  EQU	$0700
+ciaddra		  EQU	$0200
+ciaddrb		  EQU	$0300
+ciatalo		  EQU	$0400
+ciatahi		  EQU	$0500
+ciatblo		  EQU	$0600
+ciatbhi		  EQU	$0700
 ciatodlow	  EQU	$0800
 ciatodmid	  EQU	$0900
 ciatodhi	  EQU	$0A00
@@ -49,8 +49,8 @@ CIAICRB_SETCLR	  EQU	7
 * control register A bit numbers
 CIACRAB_START	  EQU	0
 CIACRAB_PBON	  EQU	1
-CIACRAB_OUTMODE   EQU	2
-CIACRAB_RUNMODE   EQU	3
+CIACRAB_OUTMODE	  EQU	2
+CIACRAB_RUNMODE	  EQU	3
 CIACRAB_LOAD	  EQU	4
 CIACRAB_INMODE	  EQU	5
 CIACRAB_SPMODE	  EQU	6
@@ -59,13 +59,13 @@ CIACRAB_TODIN	  EQU	7
 * control register B bit numbers
 CIACRBB_START	  EQU	0
 CIACRBB_PBON	  EQU	1
-CIACRBB_OUTMODE   EQU	2
-CIACRBB_RUNMODE   EQU	3
+CIACRBB_OUTMODE	  EQU	2
+CIACRBB_RUNMODE	  EQU	3
 CIACRBB_LOAD	  EQU	4
-CIACRBB_INMODE0   EQU	5
-CIACRBB_INMODE1   EQU	6
+CIACRBB_INMODE0	  EQU	5
+CIACRBB_INMODE1	  EQU	6
 CIACRBB_ALARM	  EQU	7
-
+ 
 * interrupt control register bit masks
 CIAICRF_TA	  EQU	(1<<0)
 CIAICRF_TB	  EQU	(1<<1)
@@ -78,8 +78,8 @@ CIAICRF_SETCLR	  EQU	(1<<7)
 * control register A bit masks
 CIACRAF_START	  EQU	(1<<0)
 CIACRAF_PBON	  EQU	(1<<1)
-CIACRAF_OUTMODE   EQU	(1<<2)
-CIACRAF_RUNMODE   EQU	(1<<3)
+CIACRAF_OUTMODE	  EQU	(1<<2)
+CIACRAF_RUNMODE	  EQU	(1<<3)
 CIACRAF_LOAD	  EQU	(1<<4)
 CIACRAF_INMODE	  EQU	(1<<5)
 CIACRAF_SPMODE	  EQU	(1<<6)
@@ -88,15 +88,15 @@ CIACRAF_TODIN	  EQU	(1<<7)
 * control register B bit masks
 CIACRBF_START	  EQU	(1<<0)
 CIACRBF_PBON	  EQU	(1<<1)
-CIACRBF_OUTMODE   EQU	(1<<2)
-CIACRBF_RUNMODE   EQU	(1<<3)
+CIACRBF_OUTMODE	  EQU	(1<<2)
+CIACRBF_RUNMODE	  EQU	(1<<3)
 CIACRBF_LOAD	  EQU	(1<<4)
-CIACRBF_INMODE0   EQU	(1<<5)
-CIACRBF_INMODE1   EQU	(1<<6)
+CIACRBF_INMODE0	  EQU	(1<<5)
+CIACRBF_INMODE1	  EQU	(1<<6)
 CIACRBF_ALARM	  EQU	(1<<7)
-
+ 
 * control register B INMODE masks
-CIACRBF_IN_PHI2   EQU	0
+CIACRBF_IN_PHI2	  EQU	0
 CIACRBF_IN_CNT	  EQU	(CIACRBF_INMODE0)
 CIACRBF_IN_TA	  EQU	(CIACRBF_INMODE1)
 CIACRBF_IN_CNT_TA EQU	(CIACRBF_INMODE0!CIACRBF_INMODE1)
