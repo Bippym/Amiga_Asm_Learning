@@ -1,63 +1,48 @@
 	IFND	GRAPHICS_COPPER_I
-GRAPHICS_COPPER_I	SET	1
-**
-**	$Filename: graphics/copper.i $
-**	$Release: 1.3 $
-**
-**	
-**
-**	(C) Copyright 1985,1986,1987,1988 Commodore-Amiga, Inc.
-**	    All Rights Reserved
-**
-
-COPPER_MOVE equ 0	/* pseude opcode for move #XXXX,dir */
-COPPER_WAIT equ 1	 /* pseudo opcode for wait y,x */
-CPRNXTBUF   equ 2	/* continue processing with next buffer */
-CPR_NT_LOF  equ $8000  /* copper instruction only for short frames */
-CPR_NT_SHT  equ $4000	/* copper instruction only for long frames */
-
-   STRUCTURE   CopIns,0
-      WORD  ci_OpCode	   * 0 = move, 1 = wait */
-      STRUCT   ci_nxtlist,0   * UNION
-      STRUCT   ci_VWaitPos,0
-      STRUCT   ci_DestAddr,2
-
-      STRUCT   ci_HWaitPos,0
-      STRUCT   ci_DestData,2
-
-   LABEL ci_SIZEOF
-
-* structure of cprlist that points to list that hardware actually executes */
-   STRUCTURE   cprlist,0
-      APTR  crl_Next
-      APTR  crl_start
-      WORD  crl_MaxCount
-   LABEL crl_SIZEOF
-
-   STRUCTURE   CopList,0
-      APTR  cl_Next  /* next block for this copper list */
-      APTR  cl__CopList	 /* system use */
-      APTR  cl__ViewPort /* system use */
-      APTR  cl_CopIns /* start of this block */
-      APTR  cl_CopPtr /* intermediate ptr */
-      APTR  cl_CopLStart   /* mrgcop fills this in for Long Frame*/
-      APTR  cl_CopSStart   /* mrgcop fills this in for Short Frame*/
-      WORD  cl_Count	   /* intermediate counter */
-      WORD  cl_MaxCount	  /* max # of copins for this block */
-      WORD  cl_DyOffset	   /* offset this copper list vertical waits */
-   LABEL cl_SIZEOF
-
-   STRUCTURE   UCopList,0
-      APTR     ucl_Next
-      APTR     ucl_FirstCopList /* head node of this copper list */
-      APTR     ucl_CopList /* node in use */
-   LABEL ucl_SIZEOF
-
-*  private graphics data structure
-   STRUCTURE   copinit,0
-      STRUCT   copinit_diagstrt,8
-      STRUCT   copinit_sprstrtup,2*((2*8*2)+2+(2*2)+2)
-      STRUCT   copinit_sprstop,4
-   LABEL copinit_SIZEOF
-
-	ENDC	; GRAPHICS_COPPER_I
+GRAPHICS_COPPER_I	=	1
+COPPER_MOVE	=	0
+COPPER_WAIT	=	1
+CPRNXTBUF	=	2
+CPR_NT_LOF	=	$8000
+CPR_NT_SHT	=	$4000
+	RSRESET
+CopIns		RS.B	0
+ci_OpCode	RS.W	1
+ci_nxtlist	RS.B	0
+ci_VWaitPos	RS.B	0
+ci_DestAddr	RS.B	2
+ci_HWaitPos	RS.B	0
+ci_DestData	RS.B	2
+ci_SIZEOF	RS.W	0
+	RSRESET
+cprlist		RS.B	0
+crl_Next	RS.L	1
+crl_start	RS.L	1
+crl_MaxCount	RS.W	1
+crl_SIZEOF	RS.W	0
+	RSRESET
+CopList		RS.B	0
+cl_Next		RS.L	1
+cl__CopList	RS.L	1
+cl__ViewPort	RS.L	1
+cl_CopIns	RS.L	1
+cl_CopPtr	RS.L	1
+cl_CopLStart	RS.L	1
+cl_CopSStart	RS.L	1
+cl_Count	RS.W	1
+cl_MaxCount	RS.W	1
+cl_DyOffset	RS.W	1
+cl_SIZEOF	RS.W	0
+	RSRESET
+UCopList	RS.B	0
+ucl_Next	RS.L	1
+ucl_FirstCopList	RS.L	1
+ucl_CopList	RS.L	1
+ucl_SIZEOF	RS.W	0
+	RSRESET
+copinit		RS.B	0
+copinit_diagstrt	RS.B	8
+copinit_sprstrtup	RS.B	2*[[2*8*2]+2+[2*2]+2]
+copinit_sprstop	RS.B	4
+copinit_SIZEOF	RS.W	0
+	ENDC

@@ -1,88 +1,68 @@
 	IFND	GRAPHICS_CLIP_I
-GRAPHICS_CLIP_I SET	1
-**
-**	$Filename: graphics/clip.i $
-**	$Release: 1.3 $
-**
-**	
-**
-**	(C) Copyright 1985,1986,1987,1988 Commodore-Amiga, Inc.
-**	    All Rights Reserved
-**
-
-    IFND    GRAPHICS_GFX_I
-    include "graphics/gfx.i"
-    ENDC
+GRAPHICS_CLIP_I	=	1
+	IFND	GRAPHICS_GFX_I
+	INCLUDE	graphics/gfx.i
+	ENDC
 	IFND	EXEC_SEMAPHORES_I
-	include "exec/semaphores.i"
+	INCLUDE	exec/semaphores.i
 	ENDC
-
-NEWLOCKS	equ	1
-
- STRUCTURE  Layer,0
-    LONG    lr_front
-    LONG    lr_back
-    LONG    lr_ClipRect
-    LONG    lr_rp
-    WORD    lr_MinX
-    WORD    lr_MinY
-    WORD    lr_MaxX
-    WORD    lr_MaxY
-	STRUCT	lr_reserved,4
-	WORD	lr_priority
-    WORD    lr_Flags
-    LONG    lr_SuperBitMap
-    LONG    lr_SuperClipRect
-    APTR    lr_Window
-    WORD    lr_Scroll_X
-    WORD    lr_Scroll_Y
-    APTR    lr_cr
-    APTR    lr_cr2
-    APTR    lr_crnew
-    APTR    lr_SuperSaverClipRects
-    APTR    lr__cliprects
-    APTR    lr_LayerInfo
-*			just by lucky coincidence
-*			this is not confused with simplesprites
-	STRUCT	lr_Lock,SS_SIZE
-	STRUCT	lr_reserved3,8
-	APTR	lr_ClipRegion
-	APTR	lr_saveClipRects
-	STRUCT	lr_reserved2,22
-    APTR    lr_DamageList
-    LABEL   lr_SIZEOF
-
- STRUCTURE  ClipRect,0
-    LONG    cr_Next
-    LONG    cr_prev
-    LONG    cr_lobs
-    LONG    cr_BitMap
-    WORD    cr_MinX
-    WORD    cr_MinY
-    WORD    cr_MaxX
-    WORD    cr_MaxY
-    APTR    cr__p1
-    APTR    cr__p2
-    LONG    cr_reserved
-    LONG    cr_Flags
- LABEL	    cr_SIZEOF
-
-* internal cliprect flags
-CR_NEEDS_NO_CONCEALED_RASTERS	equ	1
-
-* defines for clipping
-ISLESSX equ 1
-ISLESSY equ 2
-ISGRTRX equ 4
-ISGRTRY equ 8
-
-* for ancient history reasons
+NEWLOCKS	=	1
+	RSRESET
+Layer		RS.B	0
+lr_front	RS.L	1
+lr_back		RS.L	1
+lr_ClipRect	RS.L	1
+lr_rp		RS.L	1
+lr_MinX		RS.W	1
+lr_MinY		RS.W	1
+lr_MaxX		RS.W	1
+lr_MaxY		RS.W	1
+lr_reserved	RS.B	4
+lr_priority	RS.W	1
+lr_Flags	RS.W	1
+lr_SuperBitMap	RS.L	1
+lr_SuperClipRect	RS.L	1
+lr_Window	RS.L	1
+lr_Scroll_X	RS.W	1
+lr_Scroll_Y	RS.W	1
+lr_cr		RS.L	1
+lr_cr2		RS.L	1
+lr_crnew	RS.L	1
+lr_SuperSaverClipRects	RS.L	1
+lr__cliprects	RS.L	1
+lr_LayerInfo	RS.L	1
+lr_Lock		RS.B	SS_SIZE
+lr_reserved3	RS.B	8
+lr_ClipRegion	RS.L	1
+lr_saveClipRects	RS.L	1
+lr_reserved2	RS.B	22
+lr_DamageList	RS.L	1
+lr_SIZEOF	RS.W	0
+	RSRESET
+ClipRect	RS.B	0
+cr_Next		RS.L	1
+cr_prev		RS.L	1
+cr_lobs		RS.L	1
+cr_BitMap	RS.L	1
+cr_MinX		RS.W	1
+cr_MinY		RS.W	1
+cr_MaxX		RS.W	1
+cr_MaxY		RS.W	1
+cr__p1		RS.L	1
+cr__p2		RS.L	1
+cr_reserved	RS.L	1
+cr_Flags	RS.L	1
+cr_SIZEOF	RS.W	0
+CR_NEEDS_NO_CONCEALED_RASTERS	=	1
+ISLESSX	=	1
+ISLESSY	=	2
+ISGRTRX	=	4
+ISGRTRY	=	8
 	IFND	lr_Front
-lr_Front	equ lr_front
-lr_Back		equ lr_back
-lr_RastPort	equ	lr_rp
-cr_Prev		equ cr_prev
-cr_LObs		equ	cr_lobs
+lr_Front=	lr_front
+lr_Back	=	lr_back
+lr_RastPort=	lr_rp
+cr_Prev	=	cr_prev
+cr_LObs	=	cr_lobs
 	ENDC
-
-	ENDC	; GRAPHICS_CLIP_I
+	ENDC

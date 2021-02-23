@@ -1,0 +1,743 @@
+﻿
+WinUAE 4.4.0 (2020.07.01) 64-bit (10.0.18363 [1]) 64-bit 9.17.1801 8 23:19 1
+(c) 1995-2001 Bernd Schmidt   - Core UAE concept and implementation.
+(c) 1998-2020 Toni Wilen      - Win32 port, core code updates.
+(c) 1996-2001 Brian King      - Win32 port, Picasso96 RTG, and GUI.
+(c) 1996-1999 Mathias Ortmann - Win32 port and bsdsocket support.
+(c) 2000-2001 Bernd Meyer     - JIT engine.
+(c) 2000-2005 Bernd Roesch    - MIDI input, many fixes.
+Press F12 to show the Settings Dialog (GUI), Alt-F4 to quit.
+End+F1 changes floppy 0, End+F2 changes floppy 1, etc.
+'C:\Development\Amiga\Asm Learning\Amiga_Asm_Learning\bin\winuae.exe'
+EXE: 'C:\Development\Amiga\Asm Learning\Amiga_Asm_Learning\bin\', DATA: 'C:\Development\Amiga\Asm Learning\Amiga_Asm_Learning\bin\', PLUGIN: 'C:\Development\Amiga\Asm Learning\Amiga_Asm_Learning\bin\'
+'C:\Development\Amiga\Asm Learning\Amiga_Asm_Learning\bin\winuae.ini' enabled
+'-s quickstart=a500,1 -s "filesystem=rw,dh0:C:\Development\Amiga\Asm Learning\Amiga_Asm_Learning\uae\dh0" -s debugging_trigger=SYS:gencop -s debugging_features=gdbserver'
+params:
+1: '-s'
+2: 'quickstart=a500,1'
+3: '-s'
+4: 'filesystem=rw,dh0:C:\Development\Amiga\Asm Learning\Amiga_Asm_Learning\uae\dh0'
+5: '-s'
+6: 'debugging_trigger=SYS:gencop'
+7: '-s'
+8: 'debugging_features=gdbserver'
+MMAN: Total physical RAM 14249 MB, all RAM 23386 MB
+MMAN: Attempting to reserve: 2048 MB
+VM: Reserve  0x80000000 bytes, try address 0x80000000
+VM: Reserve  0x80000000 bytes, got address 0x80000000
+MMAN: Reserved 0000000080000000-0000000100000000 (0x80000000 2048M)
+CLOCKFREQ: QPF 10.00MHz (5.00MHz, DIV=2)
+Enumerating display devices.. 
+Sorting devices and modes..
+AMD Radeon(TM) RX Vega 10 Graphics '\\.\DISPLAY1' [PCI\VEN_1002&DEV_15D8&SUBSYS_8615103C&REV_C1]
+-: Generic PnP Monitor (1920*1080) * [\Registry\Machine\System\CurrentControlSet\Control\Class\{4d36e96e-e325-11ce-bfc1-08002be10318}\0002]
+0: 640x480, 32-bit (40,60)
+1: 800x600, 32-bit (40,60)
+2: 1024x768, 32-bit (40,60)
+3: 1280x720, 32-bit (40,60)
+4: 1280x1024, 32-bit (40,60)
+5: 1600x900, 32-bit (40,60)
+6: 1680x1050, 32-bit (40,60)
+7: 1920x1080, 32-bit (40,60)
+8 display modes.
+Desktop: W=1920 H=1080 B=32 HZ=60. CXVS=1920 CYVS=1080
+Enumerating WASAPI devices...
+Enumerating DirectSound devices..
+Enumeration end
+0:WA: Default Audio Device
+1:WA: Speaker/Headphone (Realtek(R) Audio)
+2:WX: Default Audio Device
+3:WX: Speaker/Headphone (Realtek(R) Audio)
+4:DS: Primary Sound Driver
+5:DS: Speaker/Headphone (Realtek(R) Audio)
+Enumerating recording devices:
+0:DS: Primary Sound Capture Driver
+1:DS: Microphone Array (Realtek(R) Audio)
+2:DS: Stereo Mix (Realtek(R) Audio)
+done
+Filesystem charset (ACP=1252,FSCP=28605):
+ 00: 0000        01: 0001        02: 0002        03: 0003       
+ 04: 0004        05: 0005        06: 0006        07: 0007       
+ 08: 0008        09: 0009        0A: 000A        0B: 000B       
+ 0C: 000C        0D: 000D        0E: 000E        0F: 000F       
+ 10: 0010        11: 0011        12: 0012        13: 0013       
+ 14: 0014        15: 0015        16: 0016        17: 0017       
+ 18: 0018        19: 0019        1A: 001A        1B: 001B       
+ 1C: 001C        1D: 001D        1E: 001E        1F: 001F       
+ 20: 0020        21: 0021        22: 0022        23: 0023       
+ 24: 0024        25: 0025        26: 0026        27: 0027       
+ 28: 0028        29: 0029        2A: 002A        2B: 002B       
+ 2C: 002C        2D: 002D        2E: 002E        2F: 002F       
+ 30: 0030        31: 0031        32: 0032        33: 0033       
+ 34: 0034        35: 0035        36: 0036        37: 0037       
+ 38: 0038        39: 0039        3A: 003A        3B: 003B       
+ 3C: 003C        3D: 003D        3E: 003E        3F: 003F       
+ 40: 0040        41: 0041        42: 0042        43: 0043       
+ 44: 0044        45: 0045        46: 0046        47: 0047       
+ 48: 0048        49: 0049        4A: 004A        4B: 004B       
+ 4C: 004C        4D: 004D        4E: 004E        4F: 004F       
+ 50: 0050        51: 0051        52: 0052        53: 0053       
+ 54: 0054        55: 0055        56: 0056        57: 0057       
+ 58: 0058        59: 0059        5A: 005A        5B: 005B       
+ 5C: 005C        5D: 005D        5E: 005E        5F: 005F       
+ 60: 0060        61: 0061        62: 0062        63: 0063       
+ 64: 0064        65: 0065        66: 0066        67: 0067       
+ 68: 0068        69: 0069        6A: 006A        6B: 006B       
+ 6C: 006C        6D: 006D        6E: 006E        6F: 006F       
+ 70: 0070        71: 0071        72: 0072        73: 0073       
+ 74: 0074        75: 0075        76: 0076        77: 0077       
+ 78: 0078        79: 0079        7A: 007A        7B: 007B       
+ 7C: 007C        7D: 007D        7E: 007E        7F: 007F       
+ 80: 20AC (0080) 81: 0081        82: 201A (0082) 83: 0192 (0083)
+ 84: 201E (0084) 85: 2026 (0085) 86: 2020 (0086) 87: 2021 (0087)
+ 88: 02C6 (0088) 89: 2030 (0089) 8A: 0160 (008A) 8B: 2039 (008B)
+ 8C: 0152 (008C) 8D: 008D        8E: 017D (008E) 8F: 008F       
+ 90: 0090        91: 2018 (0091) 92: 2019 (0092) 93: 201C (0093)
+ 94: 201D (0094) 95: 2022 (0095) 96: 2013 (0096) 97: 2014 (0097)
+ 98: 02DC (0098) 99: 2122 (0099) 9A: 0161 (009A) 9B: 203A (009B)
+ 9C: 0153 (009C) 9D: 009D        9E: 017E (009E) 9F: 0178 (009F)
+ A0: 00A0        A1: 00A1        A2: 00A2        A3: 00A3       
+ A4: 00A4 (20AC) A5: 00A5        A6: 00A6 (0160) A7: 00A7       
+ A8: 00A8 (0161) A9: 00A9        AA: 00AA        AB: 00AB       
+ AC: 00AC        AD: 00AD        AE: 00AE        AF: 00AF       
+ B0: 00B0        B1: 00B1        B2: 00B2        B3: 00B3       
+ B4: 00B4 (017D) B5: 00B5        B6: 00B6        B7: 00B7       
+ B8: 00B8 (017E) B9: 00B9        BA: 00BA        BB: 00BB       
+ BC: 00BC (0152) BD: 00BD (0153) BE: 00BE (0178) BF: 00BF       
+ C0: 00C0        C1: 00C1        C2: 00C2        C3: 00C3       
+ C4: 00C4        C5: 00C5        C6: 00C6        C7: 00C7       
+ C8: 00C8        C9: 00C9        CA: 00CA        CB: 00CB       
+ CC: 00CC        CD: 00CD        CE: 00CE        CF: 00CF       
+ D0: 00D0        D1: 00D1        D2: 00D2        D3: 00D3       
+ D4: 00D4        D5: 00D5        D6: 00D6        D7: 00D7       
+ D8: 00D8        D9: 00D9        DA: 00DA        DB: 00DB       
+ DC: 00DC        DD: 00DD        DE: 00DE        DF: 00DF       
+ E0: 00E0        E1: 00E1        E2: 00E2        E3: 00E3       
+ E4: 00E4        E5: 00E5        E6: 00E6        E7: 00E7       
+ E8: 00E8        E9: 00E9        EA: 00EA        EB: 00EB       
+ EC: 00EC        ED: 00ED        EE: 00EE        EF: 00EF       
+ F0: 00F0        F1: 00F1        F2: 00F2        F3: 00F3       
+ F4: 00F4        F5: 00F5        F6: 00F6        F7: 00F7       
+ F8: 00F8        F9: 00F9        FA: 00FA        FB: 00FB       
+ FC: 00FC        FD: 00FD        FE: 00FE        FF: 00FF       
+End
+CW: No Catweasel detected
+PARAPORT: no ParaPort.dll, direct parallel port emulation disabled
+IPC: Named Pipe '\\.\pipe\WinUAE' open
+Created internal serial port shared memory
+Serial port enumeration..
+Parallel port enumeration..
+Port enumeration end
+MIDI port enumeration.. IN=0 OUT=1
+MIDI OUT: -1:'Microsoft MIDI Mapper' (1/1)
+MIDI OUT: 0:'Microsoft GS Wavetable Synth' (1/27)
+MIDI port enumeration end
+RawInput enumeration..
+RAWINPUT: found 6 devices
+HID device check:
+0000000000060049 2 0EEF/C0AE (1/65280)
+RAWHID: Usage not 4 or 5 (0001)
+0000000000070569 2 0EEF/C0AE (4/13)
+(65 00 47 00 61 00 6C 00 61 00 78 00 54 00 6F 00 75 00 63 00 68 00 20 00 45 00 58 00 43 00 33 00 32 00 30 00 30 00 2D 00 32 00 35 00 30 00 35 00 2D 00 30 00 39 00 2E 00 30 00 30 00 2E 00 30 00 30 00) 'eGalaxTouch EXC3200-2505-09.00.00'
+0000000000070569 0000000000000544 [0EEF/C0AE] hid: '\\?\HID#VID_0EEF&PID_C0AE&Col01#8&ac89081&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}'
+RAWHID: 2/6 0 'eGalaxTouch EXC3200-2505-09.00.00' ('\\?\HID#VID_0EEF&PID_C0AE&Col01#8&ac89081&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}')
+Usage: 0004
+UsagePage: 000d
+InputReportByteLength: 56
+OutputReportByteLength: 0
+FeatureReportByteLength: 257
+NumberLinkCollectionNodes: 6
+NumberInputButtonCaps: 5
+NumberInputValueCaps: 17
+NumberInputDataIndices: 22
+NumberOutputButtonCaps: 0
+NumberOutputValueCaps: 0
+NumberOutputDataIndices: 0
+NumberFeatureButtonCaps: 0
+NumberFeatureValueCaps: 3
+NumberFeatureDataIndices: 3
+******** BUTTON_CAPS: 0 ********
+UsagePage: 13
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 1
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+Usage: 66
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 1
+******** BUTTON_CAPS: 1 ********
+UsagePage: 13
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 2
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+Usage: 66
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 5
+******** BUTTON_CAPS: 2 ********
+UsagePage: 13
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 3
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+Usage: 66
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 9
+******** BUTTON_CAPS: 3 ********
+UsagePage: 13
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 4
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+Usage: 66
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 13
+******** BUTTON_CAPS: 4 ********
+UsagePage: 13
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 5
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+Usage: 66
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 17
+******** VALUE_CAPS: 0 ********
+UsagePage: 13
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 0
+LinkUsage: 4
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 8
+ReportCount: 1
+UnitsExp: 0
+Units: 0
+LogicalMin: 0 (0)
+LogicalMax: 12 (12)
+PhysicalMin: 0 (0)
+PhysicalMax: 0 (0)
+Usage: 84
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 0
+******** VALUE_CAPS: 1 ********
+UsagePage: 13
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 1
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 8
+ReportCount: 1
+UnitsExp: 0
+Units: 0
+LogicalMin: 0 (0)
+LogicalMax: 31 (31)
+PhysicalMin: 0 (0)
+PhysicalMax: 0 (0)
+Usage: 81
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 2
+******** VALUE_CAPS: 2 ********
+UsagePage: 1
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 1
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 16
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 4095 (4095)
+PhysicalMin: 0 (0)
+PhysicalMax: 3465 (3465)
+Usage: 48
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 3
+******** VALUE_CAPS: 3 ********
+UsagePage: 1
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 1
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 16
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 4095 (4095)
+PhysicalMin: 0 (0)
+PhysicalMax: 1945 (1945)
+Usage: 49
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 4
+******** VALUE_CAPS: 4 ********
+UsagePage: 13
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 2
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 8
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 31 (31)
+PhysicalMin: 0 (0)
+PhysicalMax: 1945 (153)
+Usage: 81
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 6
+******** VALUE_CAPS: 5 ********
+UsagePage: 1
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 2
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 16
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 4095 (4095)
+PhysicalMin: 0 (0)
+PhysicalMax: 3465 (3465)
+Usage: 48
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 7
+******** VALUE_CAPS: 6 ********
+UsagePage: 1
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 2
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 16
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 4095 (4095)
+PhysicalMin: 0 (0)
+PhysicalMax: 1945 (1945)
+Usage: 49
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 8
+******** VALUE_CAPS: 7 ********
+UsagePage: 13
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 3
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 8
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 31 (31)
+PhysicalMin: 0 (0)
+PhysicalMax: 1945 (153)
+Usage: 81
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 10
+******** VALUE_CAPS: 8 ********
+UsagePage: 1
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 3
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 16
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 4095 (4095)
+PhysicalMin: 0 (0)
+PhysicalMax: 3465 (3465)
+Usage: 48
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 11
+******** VALUE_CAPS: 9 ********
+UsagePage: 1
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 3
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 16
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 4095 (4095)
+PhysicalMin: 0 (0)
+PhysicalMax: 1945 (1945)
+Usage: 49
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 12
+******** VALUE_CAPS: 10 ********
+UsagePage: 13
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 4
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 8
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 31 (31)
+PhysicalMin: 0 (0)
+PhysicalMax: 1945 (153)
+Usage: 81
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 14
+******** VALUE_CAPS: 11 ********
+UsagePage: 1
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 4
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 16
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 4095 (4095)
+PhysicalMin: 0 (0)
+PhysicalMax: 3465 (3465)
+Usage: 48
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 15
+******** VALUE_CAPS: 12 ********
+UsagePage: 1
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 4
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 16
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 4095 (4095)
+PhysicalMin: 0 (0)
+PhysicalMax: 1945 (1945)
+Usage: 49
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 16
+******** VALUE_CAPS: 13 ********
+UsagePage: 13
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 5
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 8
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 31 (31)
+PhysicalMin: 0 (0)
+PhysicalMax: 1945 (153)
+Usage: 81
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 18
+******** VALUE_CAPS: 14 ********
+UsagePage: 1
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 5
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 16
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 4095 (4095)
+PhysicalMin: 0 (0)
+PhysicalMax: 3465 (3465)
+Usage: 48
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 19
+******** VALUE_CAPS: 15 ********
+UsagePage: 1
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 5
+LinkUsage: 34
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 16
+ReportCount: 1
+UnitsExp: 14
+Units: 17
+LogicalMin: 0 (0)
+LogicalMax: 4095 (4095)
+PhysicalMin: 0 (0)
+PhysicalMax: 1945 (1945)
+Usage: 49
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 20
+******** VALUE_CAPS: 16 ********
+UsagePage: 13
+ReportID: 6
+IsAlias: 0
+BitField: 2
+LinkCollection: 0
+LinkUsage: 4
+LinkUsagePage: 13
+IsRange: 0
+IsStringRange: 0
+IsDesignatorRange: 0
+IsAbsolute: 1
+HasNull: 0
+BitSize: 32
+ReportCount: 1
+UnitsExp: 0
+Units: 0
+LogicalMin: 0 (0)
+LogicalMax: 2147483647 (2147483647)
+PhysicalMin: 0 (0)
+PhysicalMax: 1945 (1945)
+Usage: 86
+StringIndex: 0
+DesignatorIndex: 0
+DataIndex: 21
+unsupported usage 13/84
+unsupported usage 13/81
+unsupported usage 13/81
+unsupported usage 1/48
+unsupported usage 1/49
+unsupported usage 13/81
+unsupported usage 1/48
+unsupported usage 1/49
+unsupported usage 13/81
+unsupported usage 1/48
+unsupported usage 1/49
+unsupported usage 13/81
+unsupported usage 1/48
+unsupported usage 1/49
+unsupported usage 13/86
+
+000000000A5701DF 2 0001/0001 (12/1)
+RAWHID: Usage not 4 or 5 (000C)
+000000000001003F 1 0007/0000 (0/12)
+000000000001003F 0000000000000408 [FFFFFFFF/FFFFFFFF] keyboard: '\\?\ACPI#HPQ8001#4&25c6b3d0&0#{884b96c3-56ef-11d1-bc8c-00a0c91405dd}'
+type=7 sub=0 mode=1 fkeys=12 indicators=3 tkeys=101
+0000000000010039 0 0002/0002 (0/0)
+0000000000010039 00000000000004B4 [FFFFFFFF/FFFFFFFF] mouse: '\\?\ACPI#ETD073D#4&25c6b3d0&0#{378de44c-56ef-11d1-bc8c-00a0c91405dd}'
+id=2 buttons=2 hw=0 rate=100
+[FFFFFFFF/FFFFFFFF] '\\?\ACPI#ETD073D#4&25c6b3d0&0#{378de44c-56ef-11d1-bc8c-00a0c91405dd}' (RAW Mouse) -> 'ELAN Clickpad'
+[FFFFFFFF/FFFFFFFF] '\\?\ACPI#HPQ8001#4&25c6b3d0&0#{884b96c3-56ef-11d1-bc8c-00a0c91405dd}' (RAW Keyboard) -> 'Standard PS/2 Keyboard'
+ELAN Clickpad: [FFFFFFFF/FFFFFFFF]
+00 000 'X Axis' (0, [0 - 0, 0 - 0, 0 0 0])
+01 001 'Y Axis' (1, [0 - 0, 0 - 0, 0 0 0])
+02 002 'Wheel' (2, [0 - 0, 0 - 0, 0 0 0])
+03 003 'HWheel' (3, [0 - 0, 0 - 0, 0 0 0])
+00 000 'Button 1' (0)
+01 001 'Button 2' (1)
+02 002 'Wheel [-]' (1004)
+02 002 'Wheel [+]' (1005)
+03 003 'HWheel [-]' (1006)
+03 003 'HWheel [+]' (1007)
+eGalaxTouch EXC3200-2505-09.00.00: [0EEF/C0AE]
+30 048 'X Axis' (96, [0 - 4095, 0 - 3465, 16 17 14])
+31 049 'Y Axis' (98, [0 - 4095, 0 - 1945, 16 17 14])
+42 066 'Button 66' (132)
+30 048 'X Axis [-]' (1096)
+30 048 'X Axis [+]' (1097)
+31 049 'Y Axis [-]' (1098)
+31 049 'Y Axis [+]' (1099)
+DirectInput enumeration.. Game controllers..
+Windowsmouse initialization..
+Catweasel joymouse initialization..
+wintab tablet initialization..
+Tablet: no wintab32.dll
+end
+M 00: 'Windows mouse' (WINMOUSE1)
+J 00: 'eGalaxTouch EXC3200-2505-09.00.00' (\\?\HID#VID_0EEF&PID_C0AE&Col01#8&ac89081&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030})
+K 00: 'WinUAE keyboard' (NULLKEYBOARD)
+K 01: 'Standard PS/2 Keyboard' (\\?\ACPI#HPQ8001#4&25c6b3d0&0#{884b96c3-56ef-11d1-bc8c-00a0c91405dd})
+Stored port 0/0 d=0: added 200 0  
+Stored port 0/0 d=0: added 200 0 Windows mouse WINMOUSE1
+Port0: ID 'mouse' matched
+Stored port 1/0 d=0: added 0 0  
+Stored port 1/0 d=0: added 0 0  
+Port1: ID 'kbd1' matched
+Port2: NONE
+Port3: NONE
+config reset
+load config '.\default.uae':0
+0 2: 0 -> 0 (WinUAE keyboard)
+Stored port 0/0 d=1: added 200 0 Windows mouse WINMOUSE1
+Port0: ID 'mouse' matched
+Stored port 1/0 d=1: added 0 0  
+Port1: ID 'kbd1' matched
+Port2: NONE
+Port3: NONE
+Possible boxart path: 'df0.adf'
+Stored port 0/1 d=1: added 200 0 Windows mouse WINMOUSE1
+Port0: COMBO 'Windows mouse' + 'WINMOUSE1' matched
+Stored port 1/1 d=1: added 0 0  
+Port1: ID 'kbd1' matched
+Port2: NONE
+Port3: NONE
+Log (disabled): 'C:\Development\Amiga\Asm Learning\Amiga_Asm_Learning\bin\winuaelog.txt'

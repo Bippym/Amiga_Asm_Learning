@@ -1,204 +1,125 @@
 	IFND	GRAPHICS_GELS_I
-GRAPHICS_GELS_I SET	1
-**
-**	$Filename: graphics/gels.i $
-**	$Release: 1.3 $
-**
-**	include file for AMIGA GELS (Graphics Elements) 
-**
-**	(C) Copyright 1985,1986,1987,1988 Commodore-Amiga, Inc.
-**	    All Rights Reserved
-**
-
-*------ VS_vSflags ---------------------------------------------------
-
-*   ;-- user-set vSprite flags --
-SUSERFLAGS  EQU $00FF	      ; mask of all user-settable vSprite-flags
-    BITDEF  VS,VSPRITE,0      ; set if vSprite, clear if bob
-    BITDEF  VS,SAVEBACK,1     ; set if background is to be saved/restored
-    BITDEF  VS,OVERLAY,2      ; set to mask image of bob onto background
-    BITDEF  VS,MUSTDRAW,3     ; set if vSprite absolutely must be drawn
-*   ;-- system-set vSprite flags --
-    BITDEF  VS,BACKSAVED,8    ; this bob's background has been saved
-    BITDEF  VS,BOBUPDATE,9    ; temporary flag, useless to outside world
-    BITDEF  VS,GELGONE,10     ; set if gel is completely clipped (offscreen)
-    BITDEF  VS,VSOVERFLOW,11  ; vSprite overflow (if MUSTDRAW set we draw!)
-
-
-*------ B_flags ------------------------------------------------------
-*   ;-- these are the user flag bits --
-BUSERFLAGS  EQU $00FF	      ; mask of all user-settable bob-flags
-    BITDEF  B,SAVEBOB,0	      ; set to not erase bob
-    BITDEF  B,BOBISCOMP,1     ; set to identify bob as animComp
-*   ;-- these are the system flag bits --
-    BITDEF  B,BWAITING,8      ; set while bob is waiting on 'after'
-    BITDEF  B,BDRAWN,9	      ; set when bob is drawn this DrawG pass
-    BITDEF  B,BOBSAWAY,10     ; set to initiate removal of bob
-    BITDEF  B,BOBNIX,11	      ; set when bob is completely removed
-    BITDEF  B,SAVEPRESERVE,12 ; for back-restore during double-buffer
-    BITDEF  B,OUTSTEP,13      ; for double-clearing if double-buffer
-
-
-*------ defines for the animation procedures -------------------------
-
-ANFRACSIZE  EQU 6
-ANIMHALF    EQU $0020
-RINGTRIGGER EQU $0001
-
-*------ macros --------------------------------------------------------
-* these are GEL functions that are currently simple enough to exist as a
-* definition.  It should not be assumed that this will always be the case
-
-InitAnimate MACRO   * &animKey
-       CLR.L   \1
-       ENDM
-
-
-RemBob	    MACRO   * &b
-       OR.W    #BF_BOBSAWAY,b_BobFlags+\1
-       ENDM
-
-*------ VS : vSprite -------------------------------------------------
- STRUCTURE  VS,0    ; vSprite
-*   -- SYSTEM VARIABLES --
-*   GEL linked list forward/backward pointers sorted by y,x value
-    APTR    vs_NextVSprite    ; struct *vSprite
-    APTR    vs_PrevVSprite    ; struct *vSprite
-*   GEL draw list constructed in the order the bobs are actually drawn, then
-*   list is copied to clear list
-*   must be here in vSprite for system boundary detection
-    APTR    vs_DrawPath	      ; struct *vSprite: pointer of overlay drawing
-    APTR    vs_ClearPath      ; struct *vSprite: pointer for overlay clearing
-*   the vSprite positions are defined in (y,x) order to make sorting
-*   sorting easier, since (y,x) as a long integer
-    WORD    vs_Oldy	      ; previous position
-    WORD    vs_Oldx	      ;
-*   -- COMMON VARIABLES --
-    WORD    vs_VSFlags	      ; vSprite flags
-*   -- USER VARIABLES --
-*    the vSprite positions are defined in (y,x) order to make sorting
-*    easier, since (y,x) as a long integer
-    WORD    vs_Y	      ; screen position
-    WORD    vs_X
-    WORD    vs_Height
-    WORD    vs_Width	      ; number of words per row of image data
-    WORD    vs_Depth	      ; number of planes of data
-    WORD    vs_MeMask	      ; which types can collide with this vSprite
-    WORD    vs_HitMask	      ; which types this vSprite can collide with
-    APTR    vs_ImageData      ; *WORD pointer to vSprite image
-*    borderLine is the one-dimensional logical OR of all
-*    the vSprite bits, used for fast collision detection of edge
-    APTR    vs_BorderLine     ; *WORD: logical OR of all vSprite bits
-    APTR    vs_CollMask	      ; *WORD: similar to above except this is a 
-*    matrix pointer to this vSprite's color definitions (not used by bobs)
-    APTR    vs_SprColors      ; *WORD
-    APTR    vs_VSBob	      ; struct *bob: points home if this vSprite is 
-			      ;	 part of a bob
-*    planePick flag:  set bit selects a plane from image, clear bit selects
-*	  use of shadow mask for that plane
-*    OnOff flag: if using shadow mask to fill plane, this bit (corresponding
-*	  to bit in planePick) describes whether to fill with 0's or 1's
-*    There are two uses for these flags:
-*	       - if this is the vSprite of a bob, these flags describe how 
-*		 the bob is to be drawn into memory
-*	       - if this is a simple vSprite and the user intends on setting 
-*		 the MUSTDRAW flag of the vSprite, these flags must be set 
-*		 too to describe which color registers the user wants for 
-*		 the image
-    BYTE    vs_PlanePick
-    BYTE    vs_PlaneOnOff
-    LABEL   vs_SUserExt	      ; user definable
-    LABEL   vs_SIZEOF
-
-
-*------ BOB : bob ------------------------------------------------------
-
- STRUCTURE  BOB,0     ; bob: blitter object
-*   -- COMMON VARIABLES --
-    WORD    bob_BobFlags      ; general purpose flags (see definitions below)
-*   -- USER VARIABLES --
-    APTR    bob_SaveBuffer    ; *WORD pointer to the buffer for background 
-*    save used by bobs for "cookie-cutting" and multi-plane masking
-    APTR    bob_ImageShadow   ; *WORD
-*    pointer to BOBs for sequenced drawing of bobs
-*      for correct overlaying of multiple component animations
-    APTR    bob_Before	      ; struct *bob: draw this bob before bob pointed
-			      ; to by before
-    APTR    bob_After	      ; struct *bob: draw this bob after bob pointed
-			      ; to by after
-    APTR    bob_BobVSprite    ; struct *vSprite: this bob's vSprite definition
-    APTR    bob_BobComp	      ; struct *animComp: pointer to this bob's 
-			      ; animComp def
-    APTR    bob_DBuffer	      ; struct dBufPacket: pointer to this bob's 
-			      ; dBuf packet
-    LABEL   bob_BUserExt      ; bob user extension
-    LABEL   bob_SIZEOF
-
-*------ AC : animComp ------------------------------------------------
-
- STRUCTURE  AC,0    ; animComp
-*   -- COMMON VARIABLES --
-    WORD    ac_CompFlags      ; animComp flags for system & user
-*    timer defines how long to keep this component active:
-*      if set non-zero, timer decrements to zero then switches to nextSeq
-*      if set to zero, animComp never switches
-    WORD    ac_Timer
-*   -- USER VARIABLES --
-*    initial value for timer when the animComp is activated by the system
-    WORD    ac_TimeSet
-*    pointer to next and previous components of animation object
-    APTR    ac_NextComp	      ; struct *animComp
-    APTR    ac_PrevComp	      ; struct *animComp
-*    pointer to component component definition of next image in sequence
-    APTR    ac_NextSeq	      ; struct *animComp
-    APTR    ac_PrevSeq	      ; struct *animComp
-    APTR    ac_AnimCRoutine   ; address of special animation procedure
-    WORD    ac_YTrans	      ; initial y translation (if this is a component)
-    WORD    ac_XTrans	      ; initial x translation (if this is a component)
-    APTR    ac_HeadOb	      ; struct *animOb
-    APTR    ac_AnimBob	      ; struct *bob
-    LABEL   ac_SIZE
-
-*------ AO : animOb --------------------------------------------------
-
- STRUCTURE  AO,0    ; animOb
-*   -- SYSTEM VARIABLES --
-    APTR    ao_NextOb	      ; struct *animOb
-    APTR    ao_PrevOb	      ; struct *animOb
-*    number of calls to Animate this animOb has endured
-    LONG    ao_Clock
-    WORD    ao_AnOldY	      ; old y,x coordinates
-    WORD    ao_AnOldX	      ;
-*   -- COMMON VARIABLES --
-    WORD    ao_AnY	      ; y,x coordinates of the animOb
-    WORD    ao_AnX	      ;
-*   -- USER VARIABLES --
-    WORD    ao_YVel	      ; velocities of this object
-    WORD    ao_XVel	      ;
-    WORD    ao_XAccel	      ; accelerations of this object
-    WORD    ao_YAccel	      ;	  !!! backwards !!!
-    WORD    ao_RingYTrans     ; ring translation values
-    WORD    ao_RingXTrans     ;
-    APTR    ao_AnimORoutine   ; address of special animation procedure
-    APTR    ao_HeadComp	      ; struct *animComp: pointer to first component
-    LABEL   ao_AUserExt	      ; animOb user extension
-    LABEL   ao_SIZEOF
-
-
-*------ DBP : dBufPacket ---------------------------------------------
-* dBufPacket defines the values needed to be saved across buffer to buffer
-*   when in double-buffer mode
-
- STRUCTURE  DBP,0	      ; dBufPacket
-    WORD    dbp_BufY	      ; save the other buffers screen coordinates
-    WORD    dbp_BufX	      ;
-    APTR    dbp_BufPath	      ; struct *vSprite: carry the draw path over
-			      ; the gap
-*    these pointers must be filled in by the user
-*    pointer to other buffer's background save buffer
-    APTR    dbp_BufBuffer     ; *WORD
-*    pointer to other buffer's background plane pointers
-    APTR    dbp_BufPlanes     ; **WORD
-    LABEL   dbp_SIZEOF
-
-	ENDC	; GRAPHICS_GELS_I
+GRAPHICS_GELS_I	=	1
+SUSERFLAGS	=	$00FF
+VSB_VSPRITE	=	0
+VSF_VSPRITE	=	1<<0
+VSB_SAVEBACK	=	1
+VSF_SAVEBACK	=	1<<1
+VSB_OVERLAY	=	2
+VSF_OVERLAY	=	1<<2
+VSB_MUSTDRAW	=	3
+VSF_MUSTDRAW	=	1<<3
+VSB_BACKSAVED	=	8
+VSF_BACKSAVED	=	1<<8
+VSB_BOBUPDATE	=	9
+VSF_BOBUPDATE	=	1<<9
+VSB_GELGONE	=	10
+VSF_GELGONE	=	1<<10
+VSB_VSOVERFLOW	=	11
+VSF_VSOVERFLOW	=	1<<11
+BUSERFLAGS	=	$00FF
+BB_SAVEBOB	=	0
+BF_SAVEBOB	=	1<<0
+BB_BOBISCOMP	=	1
+BF_BOBISCOMP	=	1<<1
+BB_BWAITING	=	8
+BF_BWAITING	=	1<<8
+BB_BDRAWN	=	9
+BF_BDRAWN	=	1<<9
+BB_BOBSAWAY	=	10
+BF_BOBSAWAY	=	1<<10
+BB_BOBNIX	=	11
+BF_BOBNIX	=	1<<11
+BB_SAVEPRESERVE	=	12
+BF_SAVEPRESERVE	=	1<<12
+BB_OUTSTEP	=	13
+BF_OUTSTEP	=	1<<13
+ANFRACSIZE	=	6
+ANIMHALF	=	$0020
+RINGTRIGGER	=	$0001
+InitAnimate	MACRO
+	CLR.L	\1
+	ENDM
+RemBob	MACRO
+	OR.W	#BF_BOBSAWAY,b_BobFlags+\1
+	ENDM
+	RSRESET
+VS		RS.B	0
+vs_NextVSprite	RS.L	1
+vs_PrevVSprite	RS.L	1
+vs_DrawPath	RS.L	1
+vs_ClearPath	RS.L	1
+vs_Oldy		RS.W	1
+vs_Oldx		RS.W	1
+vs_VSFlags	RS.W	1
+vs_Y		RS.W	1
+vs_X		RS.W	1
+vs_Height	RS.W	1
+vs_Width	RS.W	1
+vs_Depth	RS.W	1
+vs_MeMask	RS.W	1
+vs_HitMask	RS.W	1
+vs_ImageData	RS.L	1
+vs_BorderLine	RS.L	1
+vs_CollMask	RS.L	1
+vs_SprColors	RS.L	1
+vs_VSBob	RS.L	1
+vs_PlanePick	RS.B	1
+vs_PlaneOnOff	RS.B	1
+vs_SUserExt	RS.W	0
+vs_SIZEOF	RS.W	0
+	RSRESET
+BOB		RS.B	0
+bob_BobFlags	RS.W	1
+bob_SaveBuffer	RS.L	1
+bob_ImageShadow	RS.L	1
+bob_Before	RS.L	1
+bob_After	RS.L	1
+bob_BobVSprite	RS.L	1
+bob_BobComp	RS.L	1
+bob_DBuffer	RS.L	1
+bob_BUserExt	RS.W	0
+bob_SIZEOF	RS.W	0
+	RSRESET
+AC		RS.B	0
+ac_CompFlags	RS.W	1
+ac_Timer	RS.W	1
+ac_TimeSet	RS.W	1
+ac_NextComp	RS.L	1
+ac_PrevComp	RS.L	1
+ac_NextSeq	RS.L	1
+ac_PrevSeq	RS.L	1
+ac_AnimCRoutine	RS.L	1
+ac_YTrans	RS.W	1
+ac_XTrans	RS.W	1
+ac_HeadOb	RS.L	1
+ac_AnimBob	RS.L	1
+ac_SIZE		RS.W	0
+	RSRESET
+AO		RS.B	0
+ao_NextOb	RS.L	1
+ao_PrevOb	RS.L	1
+ao_Clock	RS.L	1
+ao_AnOldY	RS.W	1
+ao_AnOldX	RS.W	1
+ao_AnY		RS.W	1
+ao_AnX		RS.W	1
+ao_YVel		RS.W	1
+ao_XVel		RS.W	1
+ao_XAccel	RS.W	1
+ao_YAccel	RS.W	1
+ao_RingYTrans	RS.W	1
+ao_RingXTrans	RS.W	1
+ao_AnimORoutine	RS.L	1
+ao_HeadComp	RS.L	1
+ao_AUserExt	RS.W	0
+ao_SIZEOF	RS.W	0
+	RSRESET
+DBP		RS.B	0
+dbp_BufY	RS.W	1
+dbp_BufX	RS.W	1
+dbp_BufPath	RS.L	1
+dbp_BufBuffer	RS.L	1
+dbp_BufPlanes	RS.L	1
+dbp_SIZEOF	RS.W	0
+	ENDC
