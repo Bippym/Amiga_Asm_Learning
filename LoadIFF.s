@@ -367,5 +367,5 @@ intrqs:      dc.l       0                                           ; Intreq
 sysview:     dc.l       0                                           ; Systemview
 
 myimage:
-             incbin     "C:\Development\Amiga\src2\BippyM.pic"
+             incbin     "BippyM.pic"
              even
