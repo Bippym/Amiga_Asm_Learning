@@ -1,19 +1,8 @@
-# Example project for Amiga assembly debugging
-Example of vscode workspace for Amiga Assembly building and debugging.
-The binaries are build for Osx.
+This are my Amiga Assembler sourcecodes as I learn 68k assembly on the Amiga.
 
-## Get the files
-- Download the latest [Example workspace bundle](https://github.com/prb28/vscode-amiga-wks-example/releases) according to your OS.
+THe repository is based on the Amiga Assembly Debugging workspace for Visual Studio Code. THis is to allow me to debug.
 
-## Setup VSCode
-- Launch VSCode and install the *Amiga Assembly Extension* extension
 
-## Debug the application
-- Open the workspace **File/Open Workspace...** -> Select the workspace file.
-- **Select the debug launch configuration** and press *start*
-
-![Debug example](images/debug.gif)
-
-## Documentation
-- [Wiki](https://github.com/prb28/vscode-amiga-assembly/wiki)
+## Moe info on the Visual Studio Code workspace is below. Check it out
+- (https://marketplace.visualstudio.com/items?itemName=prb28.amiga-assembly#:~:text=Amiga%20Assembly%20for%20Visual%20Studio%20Code%20is%20a,the%20Example%20workspace%20Bundle%20or%20the%20VBCC%20workspace.)
 
