@@ -29,7 +29,7 @@
 ; Constants
 
 SCREEN_WIDTH   equ 320
-SCREEN_HEIGHT  equ 256
+;SCREEN_HEIGHT  equ 256
 BITPLANE_SIZE  equ SCREEN_WIDTH / 8
 SCREEN_DEPTH   equ 4
 
@@ -145,10 +145,6 @@ restoresys:
              move.l     sysview,a1
 	
              jsr        loadview(a6)                                ; Restore the original view
-	;jsr		waittoff(a0)				; Wait for the top of the frame
-	;jsr		waittoff(a0)				; And again
-	;jsr		waitblit(a0)
-	;jsr		disownblitter(a0)
 	
              move.l     a0,d0                                       ; GFXBase ready for closing
              MOVE.l     $4,A6                                       ; Execbase
@@ -163,7 +159,7 @@ exit:
 
 
 	; Now we work out the bitplane info.
-	; Bitplane pointers need to go into the 4 registers. Each bitplane is 10240
+	; Bitplane pointers need to go into the 4 registers. Each bitplane is 10240 bytes
 	;
 	; d7 - Number of bitplanes
 	; a0 - Pointer to copperlist
@@ -252,6 +248,7 @@ SetPalette:
              add.l      #$20000,d5                                  ; Next colour register
              dbf        d7,.2                                       ; Loop
 	
+
              move.l     #$FFFFFFFE,(a0)                             ; End the copperlist
              movem.l    (sp)+,d0-d7/a0-a1
 
