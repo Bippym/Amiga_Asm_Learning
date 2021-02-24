@@ -1,5 +1,5 @@
 ; First example to load and display an iff image. 
-; Image saved in Personal Paint as an uncompressed IFF
+; Image saved in Personal Paint as an uncompressed
 ;
 ; Stages required:
 ;
@@ -14,9 +14,8 @@
 ; Hardware offsets
 
 ; Base custom address
-
-;-----------------[ Includes ]-----------------------
-             INCDIR     "include"
+             incdir     "include"
+             include    "funcdef.i"
              include    "i/custom.i"
              include    "exec/types.i"
              include    "exec/exec.i"
@@ -25,17 +24,19 @@
              include    "libraries/dos_lib.i"
              include    "graphics/gfxbase.i"
              include    "graphics/graphics_lib.i"
-;----------------------------------------------------
 
-;-----------------[ Constants ]-----------------------
+
+; Constants
+
 SCREEN_WIDTH   equ 320
 SCREEN_HEIGHT  equ 256
 BITPLANE_SIZE  equ SCREEN_WIDTH / 8
 SCREEN_DEPTH   equ 4
 
-;-----------------[ Library Offsets ]-----------------------
+;library offsets
+
 exec           equ $4
-openlibrary    equ -408
+openlibrary    equ -$198
 closelibrary   equ -414
 forbid         equ -132
 permit         equ -138
@@ -55,16 +56,17 @@ old_Clist2_off equ 50
 
 start:
              movem.l    d0-d7/a0-a6,-(sp)                           ; Preserve registers
+
              move.l     $4,a6                                       ; execbase
-             lea        CUSTOM,a5                                   ; custom base ($DFF000)
+             lea        $DFF000,a5                                  ; custom base
 	
 	; Allocate ram for copperlist
-             move.l     #1024,d0                                    ; 1k to reserve
-             move.l     #MEMF_CHIP,d1                               ; We need chipram
-             jsr        _LVOAllocMem(a6)                            ; Allocate the memory
+             move.l     #1024,d0
+             move.l     #MEMF_CHIP,d1
+             jsr        _LVOAllocMem(a6)
              move.l     d0,copperlist                               ; save copperlist address
 	
-	; Load gfx library and get the system copperlist
+	; Load gfx library first and get the system copperlist
              clr.l      d0                                          ; any version
              move.l     #gfxname,a1                                 ; gfx library
              jsr        _LVOOpenLibrary(a6)                         ; openlibrary
@@ -143,7 +145,11 @@ restoresys:
              move.l     sysview,a1
 	
              jsr        loadview(a6)                                ; Restore the original view
-
+	;jsr		waittoff(a0)				; Wait for the top of the frame
+	;jsr		waittoff(a0)				; And again
+	;jsr		waitblit(a0)
+	;jsr		disownblitter(a0)
+	
              move.l     a0,d0                                       ; GFXBase ready for closing
              MOVE.l     $4,A6                                       ; Execbase
              jsr        permit(a6)                                  ; Enable multitasking
@@ -157,7 +163,7 @@ exit:
 
 
 	; Now we work out the bitplane info.
-	; Bitplane pointers need to go into the 4 registers. Each bitplane is 10240 bytes
+	; Bitplane pointers need to go into the 4 registers. Each bitplane is 10240
 	;
 	; d7 - Number of bitplanes
 	; a0 - Pointer to copperlist
@@ -237,7 +243,7 @@ SetPalette:
              move.b     d1,d5                                       ; Move red
              lsl.w      #4,D5                                       ; Shift to the left
              or.w       D2,D5                                       ; Move green in
-             lsl.w      #4,D5                                       ; And shift
+             lsl.w      #4,D5                                       ; ANd shift
              or.w       D3,D5                                       ; Move in blue
              lsr.w      #4,d5                                       ; fix the offset
 	
