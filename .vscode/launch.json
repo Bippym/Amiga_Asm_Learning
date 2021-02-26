@@ -38,7 +38,7 @@
             "request": "launch",
             "name": "WinUAE Debug",
             "buildWorkspace": true,
-            "stopOnEntry": false,
+            "stopOnEntry": true,
             "serverName": "localhost",
             "serverPort": 2345,
             "startEmulator": true,

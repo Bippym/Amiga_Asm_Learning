@@ -24,8 +24,9 @@
              include    "libraries/dos_lib.i"
              include    "graphics/gfxbase.i"
              include    "graphics/graphics_lib.i"
+             include    "Startup.i"
 
-
+Begin:
 ; Constants
 
 SCREEN_WIDTH   equ 320
@@ -81,43 +82,13 @@ start:
              move.l     old_View_off(a1),sysview
 
              bsr        setnewcop
-	;bsr		SetPalette
 
-takesys:
+             jsr        takesys
 
-	; Backup our system
-	
-             move.w     DMACONR(a5),d0
-             or.w       #$8000,d0
-             move.w     d0,dmasys
-	
-             move.w     ADKCONR(a5),d0
-             or.w       #$8000,d0
-             move.w     d0,adksys
-	
-             move.w     INTENAR(a5),d0
-             or.w       #$8000,d0
-             move.w     d0,intsys
-	
-             move.w     INTREQR(a5),d0
-             or.w       #$8000,d0
-             move.w     d0,intrqs
-	
-	; Turn off multitasking
-	
-             jsr        forbid(a6)
-
-	; Take the system
-	
-             move.w     #$7fff,DMACON(a5)
-             move.w     #$7fff,INTENA(a5)
-             move.w     #$7fff,INTREQ(a5)
-	
 	; Now setup my system
              move.w     #$8380,DMACON(a5)
              move.w     #$C010,INTENA(a5)                           ; Vertical blamk, and master enable	
 
-	
              move.l     copperlist,COP1LCH(a5)                      ; pop my copperlist in
              move.w     #0,COPJMP1(a5)                              ; Initiate copper
 mwait:	
@@ -363,10 +334,6 @@ gfxbase:
              even
 sys1cop:     dc.l       0                                           ; System copperlist
 sys2cop:     dc.l       0                                           ; System copperlist2
-dmasys:      dc.l       0                                           ; dma
-adksys:      dc.l       0                                           ; ADKconR
-intsys:      dc.l       0                                           ; Intenar
-intrqs:      dc.l       0                                           ; Intreq
 sysview:     dc.l       0                                           ; Systemview
 
 myimage:
