@@ -81,8 +81,8 @@ start:
              move.l     old_Clist2_off(a1),sys2cop
              move.l     old_View_off(a1),sysview
 
+    ; Set my copperlist up
              bsr        setnewcop
-
              jsr        takesys
 
 	; Now setup my system
@@ -91,6 +91,8 @@ start:
 
              move.l     copperlist,COP1LCH(a5)                      ; pop my copperlist in
              move.w     #0,COPJMP1(a5)                              ; Initiate copper
+
+; Loop
 mwait:	
              btst       #6,$BFE001
              bne        mwait
@@ -128,6 +130,7 @@ exit:
              move.l     #0,d0                                       ; Ensure d0 is cleared
              rts                                                    ; exit
 
+; -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-
 
 	; Now we work out the bitplane info.
 	; Bitplane pointers need to go into the 4 registers. Each bitplane is 10240 bytes
@@ -146,7 +149,7 @@ setnewcop:
              move.w     #BPLCON1,(a0)+
              move.w     #0,(a0)+
              move.w     #BPLCON2,(a0)+
-             move.w     #0,(a0)+
+             move.w     #$24,(a0)+
              move.w     #BPL1MOD,(a0)+
              move.w     #(SCREEN_WIDTH/8)*(SCREEN_DEPTH-1),(a0)+
              move.w     #BPL2MOD,(a0)+
@@ -218,6 +221,14 @@ SetPalette:
 	
              add.l      #$20000,d5                                  ; Next colour register
              dbf        d7,.2                                       ; Loop
+
+
+	; We work out the sprite info.
+	; Sprite pointers need to go into the 16 registers.
+	;
+	; d7 - Number of sprites (8-1)
+	; a0 - Pointer to copperlist
+	; d1 - Pointer to sprite data image
 	
              ; Set sprite pointers into registers
 SetSprite:
@@ -226,16 +237,21 @@ SetSprite:
              move.l     #(SPR0PTH<<16),d0                           ; Sprite high pointer $01020000
 .3           move.l     a1,d1                                       ; Address of sprite copied
              swap       d1                                          ; swap the address round so the high word is moveable
-             move.w     d1,d0                                       ; and move it into d0 (d0 = $00E0xxxx)
+             move.w     d1,d0                                       ; and move it into d0 (d0 = $0102xxxx)
              move.l     d0,(a0)+                                    ; Pop it into the copperlist
              swap       d1                                          ; Swap the address back
-             add.l      #$20000,d0                                  ; move to the BPLxPTL
+             add.l      #$20000,d0                                  ; move to the SPR0PTL
              move.w     d1,d0                                       ; Low part of the address in
-             move.l     d0,(a0)+                                    ; ANd pop the address into the copper
-             add.l      #$20000,d0                                  ; Next BPLxPTH (next bitplane)
+             move.l     d0,(a0)+                                    ; And pop the address into the copper
+             add.l      #$20000,d0                                  ; Next SPRxPTH (next sprite)
              lea        NullSpr,a1                                  ; pointer to the null sprite data
              ;add.l      #(SCREEN_WIDTH/8),a1                       ; Next bitplane image
-             dbf        d7,.1                                       ; loop
+             dbf        d7,.3                                       ; loop
+
+             move.l     #$1a20000,(a0)+                             ; Sprite colour registers (17-19) (Black)
+             move.l     #$1a40f00,(a0)+                             ; (red)
+             move.l     #$1a60ff0,(a0)+                             ; (yellow)
+
           
              move.l     #$FFFFFFFE,(a0)                             ; End the copperlist
              movem.l    (sp)+,d0-d7/a0-a1
