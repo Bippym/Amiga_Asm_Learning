@@ -86,7 +86,7 @@ start:
              jsr        takesys
 
 	; Now setup my system
-             move.w     #$8380,DMACON(a5)
+             move.w     #$87e0,DMACON(a5)
              move.w     #$C010,INTENA(a5)                           ; Vertical blamk, and master enable	
 
              move.l     copperlist,COP1LCH(a5)                      ; pop my copperlist in
@@ -219,7 +219,24 @@ SetPalette:
              add.l      #$20000,d5                                  ; Next colour register
              dbf        d7,.2                                       ; Loop
 	
-
+             ; Set sprite pointers into registers
+SetSprite:
+             move.l     #8-1,d7                                     ; Number of sprites
+             lea        Sprite,a1                                   ; Sprite address
+             move.l     #(SPR0PTH<<16),d0                           ; Sprite high pointer $01020000
+.3           move.l     a1,d1                                       ; Address of sprite copied
+             swap       d1                                          ; swap the address round so the high word is moveable
+             move.w     d1,d0                                       ; and move it into d0 (d0 = $00E0xxxx)
+             move.l     d0,(a0)+                                    ; Pop it into the copperlist
+             swap       d1                                          ; Swap the address back
+             add.l      #$20000,d0                                  ; move to the BPLxPTL
+             move.w     d1,d0                                       ; Low part of the address in
+             move.l     d0,(a0)+                                    ; ANd pop the address into the copper
+             add.l      #$20000,d0                                  ; Next BPLxPTH (next bitplane)
+             lea        NullSpr,a1                                  ; pointer to the null sprite data
+             ;add.l      #(SCREEN_WIDTH/8),a1                       ; Next bitplane image
+             dbf        d7,.1                                       ; loop
+          
              move.l     #$FFFFFFFE,(a0)                             ; End the copperlist
              movem.l    (sp)+,d0-d7/a0-a1
 
@@ -298,6 +315,9 @@ setcopper:
 	
              add        #2,d3
              dbf        d5,.2                                       ; Loop
+
+             ; Set the sprite data
+             
 	
              move.l     #$FFFFFFFE,(a0)                             ; End the copperlist
 	
@@ -306,6 +326,8 @@ setcopper:
 ;***********************************************************************************************
 	
              SECTION    coplistexample,DATA_C
+
+
 
 copperlist1:
              dc.w       $01fc,$0000                                 ; Slow fetch mode, AGA compatibility
@@ -335,6 +357,32 @@ gfxbase:
 sys1cop:     dc.l       0                                           ; System copperlist
 sys2cop:     dc.l       0                                           ; System copperlist2
 sysview:     dc.l       0                                           ; Systemview
+
+
+Sprite:
+             dc.w       $2c40,$3c00
+             dc.w       %0000011111000000,%0000000000000000
+             dc.w       %0001111111110000,%0000000000000000
+             dc.w       %0011111111111000,%0000000000000000
+             dc.w       %0111111111111100,%0000000000000000
+             dc.w       %0110011111001100,%0001100000110000
+             dc.w       %1110011111001110,%0001100000110000
+             dc.w       %1111111111111110,%0000000000000000
+             dc.w       %1111111111111110,%0000000000000000
+             dc.w       %1111111111111110,%0010000000001000
+             dc.w       %1111111111111110,%0001100000110000
+             dc.w       %0111111111111100,%0000011111000000
+             dc.w       %0111111111111100,%0000000000000000
+             dc.w       %0011111111111000,%0000000000000000
+             dc.w       %0001111111110000,%0000000000000000
+             dc.w       %0000011111000000,%0000000000000000
+             dc.w       %0000000000000000,%0000000000000000
+             dc.w       0,0
+
+NullSpr:
+             dc.w       $2a20,$2b00
+             dc.w       0,0
+             dc.w       0,0
 
 myimage:
              incbin     "BippyM.pic"
