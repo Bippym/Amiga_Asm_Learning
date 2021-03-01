@@ -92,10 +92,37 @@ start:
              move.l     copperlist,COP1LCH(a5)                      ; pop my copperlist in
              move.w     #0,COPJMP1(a5)                              ; Initiate copper
 
-; Loop
+MoveSprite:
+             clr.l      d1
+             lea        Sprite+1,a1                                 ; Address of sprite into a1
+             move.b     (a1),d1                                     ; Sprite control into d1
+             move.b     #215,d2                                     ; End of movement rhs of screen
+             move.b     #$40,d3                                     ; Start of movement lhs
+
+.1          
+             jsr        WaitRaster
+             bsr        mwait
+             add.b      #1,d1                                       ; Add 1 to sprite H
+             move.b     d1,(a1)                                     ; Move into the control word
+             cmp.b      d2,d1                                       ; Are we at the RHS of screen
+             bls        .1                                          ; No, loop
+ 
+.2           
+             jsr        WaitRaster
+             bsr        mwait
+             sub.b      #1,d1                                       ; Subtract 1 from position
+             move.b     d1,(a1)                                     ; Move into control work H
+             cmp.b      d3,d1                                       ; Are we lower then LHS
+             bhi        .2                                          ; No, loop
+
+             bra        .1                                          ; Back to the start
+
 mwait:	
+             
              btst       #6,$BFE001
-             bne        mwait
+             beq        restoresys
+             rts
+
 
 
 restoresys:
