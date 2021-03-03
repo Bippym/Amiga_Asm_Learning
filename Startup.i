@@ -7,8 +7,6 @@
 
 ; Take system routines
 
-         jmp        Begin
-
 takesys:
 
 	; Backup our system
