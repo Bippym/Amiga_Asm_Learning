@@ -102,8 +102,8 @@ start:
                 move.l     copperlist,COP1LCH(a5)                             ; pop my copperlist in
                 move.w     #0,COPJMP1(a5)                                     ; Initiate copper
 
-                ;jmp        AnimateSprite
-                jmp        skipsprite
+                jmp        AnimateSprite
+                ;jmp        skipsprite
 MoveSprite:
                 clr.l      d0
                 move.l     spr_cur_frame,d0
@@ -204,7 +204,13 @@ AnimateSprite:
                 move.l     #sprsize,d1                                        ; Size of 1 sprite
                 dbf        d3,.1                                              ; Loop to next sprite
                 addq       #1,d0
-                move.b     d0,spr_cur_frame                                   ; Increase the frame counter                        
+                cmp.b      #17,d0                                             ; Last frame check
+                beq        .2
+                bra        .3
+
+.2              move.l     #0,d0                                              ; Back to frame 0
+                
+.3              move.b     d0,spr_cur_frame                                   ; Increase the frame counter                        
                 movem.l    (sp)+,d0-d3/a0-a2
 
                 jmp        skipsprite
@@ -215,6 +221,14 @@ mwait:
                 rts
 
 skipsprite:
+wframe:
+                btst       #0,$dff005
+                bne.b      wframe
+                cmp.b      #$2a,$dff006
+                bne.b      wframe
+wframe2:
+                cmp.b      #$2a,$dff006
+                beq.b      wframe2
                 btst       #6,$BFE001
                 bne        skipsprite
               
@@ -278,7 +292,7 @@ setnewcop:
                 move.w     #(SCREEN_WIDTH/8)*(SCREEN_DEPTH-1),(a0)+
                 move.l     #DIWSTRT<<16+$2c81,(a0)+
                 move.l     #DIWSTOP<<16+$2cc1,(a0)+                           ; f4c1/2c
-                move.l     #DIWSTOP<<16+$38c1,(a0)+                           ; PAL offset > 256
+                ;move.l     #DIWSTOP<<16+$38c1,(a0)+                           ; PAL offset > 256
                 move.l     #DDFSTRT<<16+$0038,(a0)+
                 move.l     #DDFSTOP<<16+$00D0,(a0)+
 
@@ -437,23 +451,6 @@ SetSprite:
 	
                 SECTION    coplistexample,DATA_C
 
-copperlist1:
-                dc.w       $01fc,$0000                                        ; Slow fetch mode, AGA compatibility
-                dc.w       $0100,$5200                                        ; Lowres 4BPP screen
-                dc.w       $0102,$0000
-                dc.w       $0104,$0000	
-                dc.w       $0108,$0000                                        ; Bpl1Mod (odd planws)
-                dc.w       $010a,$0000                                        ; Bpl2mod (even planes)
-                dc.w       DIWSTRT,$2c81                                      ; Upper left
-                dc.w       DIWSTOP,$f4c1
-                dc.w       DIWSTOP,$38C1                                      ; Pal
-                dc.w       DDFSTRT,$0038
-                dc.w       DDFSTOP,$00D0		
-
-bplane:         ds.b       1024                                               ; reserve some copperlist space
-                even
-	
-
 copperlist:     dc.l       0	
                 even
 gfxname:
@@ -478,13 +475,15 @@ spr3copaddr:    dc.l       0
 
 spr_cur_frame:  dc.b       0                                                  ; Current sprite frame (1-16)
 
+                even
+
 SpritePal:    
                 dc.w       $0F0F,$07DF,$0FFF,$008F,$0865,$0975,$0B97,$0DB9
                 dc.w       $0EDC,$0CBE,$0A9C,$087A,$0658,$0436,$0755,$0F0F
 
 ; Include the agony sprite images. 32 attached sprites for the full animation
-               ; include    "owl.src"
-                include    "Agony.spr"  
+                include    "owl.src"
+              ; include    "Agony.spr"  
 
 NullSpr:
                 dc.w       $2a20,$2b00
