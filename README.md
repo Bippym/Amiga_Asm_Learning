@@ -1,6 +1,8 @@
-This are my Amiga Assembler sourcecodes as I learn 68k assembly on the Amiga.
+This is my Amiga Assembler sourcecodes as I learn 68k assembly on the Amiga.
 
-THe repository is based on the Amiga Assembly Debugging workspace for Visual Studio Code. THis is to allow me to debug.
+Don't expect pretty code, optimised code or code that makes sense.. Learning is a long process and I will no doubt do a lot wrong.
+
+THe repository is based on the Amiga Assembly Debugging workspace for Visual Studio Code by prb28. This is a fantastic plugin for VSCode Check it out below
 
 
 ## More info on the Visual Studio Code workspace is below. Check it out

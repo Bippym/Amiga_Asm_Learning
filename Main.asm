@@ -419,7 +419,6 @@ spr_cur_frame:  dc.b       0                                                  ; 
 SpritePal:    
                 dc.w       $0F0F,$07DF,$0FFF,$008F,$0865,$0975,$0B97,$0DB9
                 dc.w       $0EDC,$0CBE,$0A9C,$087A,$0658,$0436,$0755,$0F0F
-                even
 
 ; Include the agony sprite images. 32 attached sprites for the full animation
                 include    "owl.src"
