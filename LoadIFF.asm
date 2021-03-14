@@ -102,73 +102,7 @@ start:
                 move.l     copperlist,COP1LCH(a5)                             ; pop my copperlist in
                 move.w     #0,COPJMP1(a5)                                     ; Initiate copper
 
-                jmp        AnimateSprite
-                ;jmp        skipsprite
-MoveSprite:
-                clr.l      d0
-                move.l     spr_cur_frame,d0
-
-              
-              
-              ; Set sprite control words. Attached sprites share the same control except for the attach bit
-
-                lea        Sprite1a+1,a1                                      ; Address of sprite into a1
-                lea        Sprite1b+1,a3                                      ; Address of attached sprite
-                move.b     (a1),d1                                            ; Sprite control into d1
-              
-      
-                move.b     #215,d2                                            ; End of movement rhs of screen
-                move.b     #$40,d3                                            ; Start of movement lhs
-
-.1          
-                jsr        WaitRaster
-                bsr        mwait
-                add.b      #1,d1                                              ; Add 1 to sprite H
-                move.b     d1,(a1)                                            ; Move into the control word
-                move.b     d1,(a3)                                            ; Move into attached sprite control word
-                cmp.b      d2,d1                                              ; Are we at the RHS of screen
-                bls        .1                                                 ; No, loop
-
-              ; Update animation frame
-              ; Copy control word from sprite 1 to sprite 2/3
-                lea        Sprite2a,a2                                        ; Sprite address
-                lea        Sprite2a+1,a1
-                move.b     d1,(a1)
-                bsr        Setspriteframe                                     ; Set it
-.2           
-                jsr        WaitRaster
-                bsr        mwait
-                sub.b      #1,d1                                              ; Subtract 1 from position
-                move.b     d1,(a1)                                            ; Move into control work H
-                cmp.b      d3,d1                                              ; Are we lower then LHS
-                bhi        .2                                                 ; No, loop
-
-              ; Change sprite frame
-                lea        Sprite1a,a2                                        ; Sprite address
-                lea        Sprite1a+1,a1
-                move.b     d1,(a1)
-                bsr        Setspriteframe                                     ; Set it
-
-                bra        .1                                                 ; Back to the start
-
-Setspriteframe:
-            ; set the next animation frame
-            ; a2 -> pointer to next frame to display
-
-                movem.l    d0-d1/a0-a2,-(sp)                                  ; preserve our registers
-                move.l     spr0copaddr,a0                                     ; Address of the sprite control
-                move.l     #(SPR0PTH<<16),d0                                  ; Sprite high pointer $01020000
-                move.l     a2,d1                                              ; Address of sprite copied
-                swap       d1                                                 ; swap the address round so the high word is moveable
-                move.w     d1,d0                                              ; and move it into d0 (d0 = $0102xxxx)
-                move.l     d0,(a0)+                                           ; Pop it into the copperlist
-                swap       d1                                                 ; Swap the address back
-                add.l      #$20000,d0                                         ; move to the SPR0PTL
-                move.w     d1,d0                                              ; Low part of the address in
-                move.l     d0,(a0)+                                           ; And pop the address into the copper
-                movem.l    (sp)+,d0-d1/a0-a2
-                rts
-
+AnimateSprite:
 ; Animate sprite routine. Animates a sprite
 ; Registers used
 ; d0 - Current sprite frame (0-15) and then offset
@@ -178,17 +112,17 @@ Setspriteframe:
 ; a0 - Sprite address from the copper
 ; a1 - Location of current sprite
 
-AnimateSprite:
-
                 movem.l    d0-d3/a0-a2,-(sp)
 
-              ; Get address of first sprite
-                clr.l      d0
-                clr.l      d3
+                moveq      #0,d0
+                moveq      #0,d1
+                moveq      #0,d2
+                moveq      #0,d3
 
+              ; Get address of first sprite
                 move.b     #4-1,d3                                            ; Num of sprites to make a frame
                 move.l     spr0copaddr,a0                                     ; Location of the first sprite in the copperlist ($0120xxxx)
-                move.b     spr_cur_frame,d0
+                move.b     spr_cur_frame,d0                                   ; What frame are we on?
                 move.w     #sprskip,d1                                        ; Number of sprites to skip
                 mulu       d0,d1                                              ; offset
                 lea        Sprite1a,a1                                        ; address of first sprite
@@ -204,13 +138,15 @@ AnimateSprite:
                 move.l     #sprsize,d1                                        ; Size of 1 sprite
                 dbf        d3,.1                                              ; Loop to next sprite
                 addq       #1,d0
-                cmp.b      #17,d0                                             ; Last frame check
-                beq        .2
-                bra        .3
+
+                ; Check if we are on the last frame, if so we go back to the first frame
+                cmp.b      #16,d0                                             
+                beq        .2                                                 ; Last frame, so we reset to 0
+                bra        .3                                                 ; Less than the last frame
 
 .2              move.l     #0,d0                                              ; Back to frame 0
                 
-.3              move.b     d0,spr_cur_frame                                   ; Increase the frame counter                        
+.3              move.b     d0,spr_cur_frame                                   ; Save the frame counter                     
                 movem.l    (sp)+,d0-d3/a0-a2
 
                 jmp        skipsprite
@@ -229,8 +165,11 @@ wframe:
 wframe2:
                 cmp.b      #$2a,$dff006
                 beq.b      wframe2
+
+
                 btst       #6,$BFE001
-                bne        skipsprite
+                bne        AnimateSprite
+                ;bne        skipsprite
               
               
 
@@ -480,6 +419,7 @@ spr_cur_frame:  dc.b       0                                                  ; 
 SpritePal:    
                 dc.w       $0F0F,$07DF,$0FFF,$008F,$0865,$0975,$0B97,$0DB9
                 dc.w       $0EDC,$0CBE,$0A9C,$087A,$0658,$0436,$0755,$0F0F
+                even
 
 ; Include the agony sprite images. 32 attached sprites for the full animation
                 include    "owl.src"
@@ -491,5 +431,6 @@ NullSpr:
                 dc.w       0,0
 
 myimage:
+                cnop       0,8
                 incbin     "BippyM.pic"
                 even
