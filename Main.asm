@@ -30,6 +30,7 @@
                 include    "Startup.i"
                 include    "Functions.asm"
                 include    "joy.asm"
+                Include    "Sprite_Functions.asm"
 
 ProgStart:
 ; Constants
@@ -102,61 +103,8 @@ start:
                 move.l     copperlist,COP1LCH(a5)                             ; pop my copperlist in
                 move.w     #0,COPJMP1(a5)                                     ; Initiate copper
 
-AnimateSprite:
-; Animate sprite routine. Animates a sprite
-; Registers used
-; d0 - Current sprite frame (0-15) and then offset
-; d1 - number of sprites to skip
-; d2 - Sprite address for swapping about
-; d3 - Loop counter
-; a0 - Sprite address from the copper
-; a1 - Location of current sprite
+MAINLOOP:
 
-                movem.l    d0-d3/a0-a2,-(sp)
-
-                moveq      #0,d0
-                moveq      #0,d1
-                moveq      #0,d2
-                moveq      #0,d3
-
-              ; Get address of first sprite
-                move.b     #4-1,d3                                            ; Num of sprites to make a frame
-                move.l     spr0copaddr,a0                                     ; Location of the first sprite in the copperlist ($0120xxxx)
-                move.b     spr_cur_frame,d0                                   ; What frame are we on?
-                move.w     #sprskip,d1                                        ; Number of sprites to skip
-                mulu       d0,d1                                              ; offset
-                lea        Sprite1a,a1                                        ; address of first sprite
-
-.1              add.l      #$2,a0
-                add.l      d1,a1                                              ; Point to the first sprite of the next frame 
-                move.l     a1,d2                                              ; Address of sprite
-                swap       d2                                                 ; Get the high word
-                move.w     d2,(a0)+                                           ; Pop address into the copper
-                add.l      #$2,a0                                             ; Get the low word
-                swap       d2
-                move.w     d2,(a0)+                                           ; Pop into the copper and advance to next sprite pointer
-                move.l     #sprsize,d1                                        ; Size of 1 sprite
-                dbf        d3,.1                                              ; Loop to next sprite
-                addq       #1,d0
-
-                ; Check if we are on the last frame, if so we go back to the first frame
-                cmp.b      #16,d0                                             
-                beq        .2                                                 ; Last frame, so we reset to 0
-                bra        .3                                                 ; Less than the last frame
-
-.2              move.l     #0,d0                                              ; Back to frame 0
-                
-.3              move.b     d0,spr_cur_frame                                   ; Save the frame counter                     
-                movem.l    (sp)+,d0-d3/a0-a2
-
-                jmp        skipsprite
-mwait:	
-             
-                btst       #6,$BFE001
-                beq        restoresys
-                rts
-
-skipsprite:
 wframe:
                 btst       #0,$dff005
                 bne.b      wframe
@@ -168,10 +116,79 @@ wframe2:
 
 
                 btst       #6,$BFE001
-                bne        AnimateSprite
-                ;bne        skipsprite
+                beq        mwait
+                bsr        ReadInput
+
+                ; Test joystick
+.tst_up         btst       #0,d7                                              ; Up
+                beq        .tst_down
+
+                move.w     #$0,COLOR00(a5)
+		
+.tst_down		
+                btst       #1,d7                                              ; Down
+                beq        .tst_left
+
+                move.w     #$0FF0,COLOR00(a5)
+		
+.tst_left
+                btst       #2,d7                                              ; Left
+                beq        .tst_right
+
+                move.w     #$00FF,COLOR00(a5)
+		
+.tst_right
+                btst       #3,d7                                              ; Right
+                beq        .tst_fire1
+
+                move.w     #$0F0F,COLOR00(a5)
+                clr.l      d0
+                clr.l      d1
+                clr.l      d2
+                clr.l      d3
+
+                ; Sprite control words to be adjusted/edited
+                move.w     spr_xPos,d0
+                move.w     spr_yPos,d1
+
+                move.b     #sprheight,d2
+                add.b      d1,d2
+                move.w     d2,d3
+                addq       #1,d0
+
+                move.b     d0,spr_data+1
+                move.b     d1,spr_data
+                move.b     d2,spr_data+2
+
+
+;move.w SpriteXPosition,d0
+;move.w d0,d1
+;and.w #1,d1
+;lsr.w #1,d0
+;move.b d0,SpriteData+1
+;move.b d1,SpriteData+3
+
+                jsr        AnimateSprite
+                ;move.b     d1,spr_data+3  
+                
+
+.tst_fire1
+                btst       #8,d7                                              ; Fire 1
+                beq        .tst_fire2
+
+                bra        mwait
+		
+.tst_fire2
+                btst       #9,d7                                              ; Fire 2
+                beq        .done
+
+.done
+                bsr        AnimateSprite
+                bra        MAINLOOP
               
-              
+mwait:	
+                beq        restoresys
+                rts              
 
 restoresys:
 	; Restore the system
@@ -320,7 +337,7 @@ SetPalette:
 SetSprite:
               ; left half of the owl. Sprite 0
                 move.l     a0,spr0copaddr                                     ; Offset to the sprite copper address
-                move.l     #8-5,d7                                            ; Number of sprites (8 - the attached sprites 0/1 and 2/3)
+                move.l     #8-4,d7                                            ; Number of sprites (8 - the attached sprites 0/1 and 2/3)
 
                 lea        Sprite1a,a1                                        ; Sprite address
                 move.l     #(SPR0PTH<<16),d0                                  ; Sprite high pointer $01020000
@@ -359,7 +376,7 @@ SetSprite:
                 move.w     d1,d0                                              ; Low part of the address in
                 move.l     d0,(a0)+                                           ; And pop the address into the copper
 
-              ; Sprite 1, attached
+              ; Sprite 2, attached
                 move.l     a0,spr3copaddr                                     ; Save attached sprite address
                 lea        Sprite2b,a1                                        ; Attach sprite location
                 move.l     #(SPR3PTH<<16),d0                                  ; Sprite 1 high pointer
@@ -406,13 +423,17 @@ sysview:        dc.l       0                                                  ; 
 ; memory locations within the copperlist. This will allow us to update the copperlist dynamically
 ; Allowing some animation.
 
+; Sprite Data
 
 spr0copaddr:    dc.l       0                                                  ; Address within copperlist to adjust sprite pointer
 spr1copaddr:    dc.l       0
 spr2copaddr:    dc.l       0                                                  ; Address within copperlist to adjust sprite pointer
 spr3copaddr:    dc.l       0
 
-spr_cur_frame:  dc.b       0                                                  ; Current sprite frame (1-16)
+spr_xPos        dc.w       $40
+spr_yPos        dc.w       $2C
+spr_cur_frame:  dc.b       0
+spr_data        dc.w       $2C40,$8200                                        ; Control words for sprite
 
                 even
 
