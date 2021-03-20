@@ -46,7 +46,9 @@ SCREEN_DEPTH   equ 4
 sprheight      equ 86
 sprsize        equ (sprheight*4)+8                                            ; Bytes to skip to next sprite (sprheight*bytesperline+controlwords)
 sprskip        equ sprsize*4
-                                                                              ; We multiply this by 4 to get the next frame
+
+SPRxSPD        equ 1
+SPRySPD        equ 2
 
 ;library offsets
 exec           equ $4
@@ -119,58 +121,88 @@ wframe2:
                 beq        mwait
                 bsr        ReadInput
 
-                ; Test joystick
+                ; Test MOVEMENT
+                ; Registers used by this routine
+
+                ; d0 - Sprite Y position
+                ; d1 - Sprite height
+                ; d2 - Sprite X position
+
+                move.w     spr_yPos,d0
+                move.w     spr_xPos,d2
+                move.w     #sprheight,d1
+
 .tst_up         btst       #0,d7                                              ; Up
                 beq        .tst_down
 
                 move.w     #$0,COLOR00(a5)
-		
+
+                ; Sprite control words to be adjusted/edited
+                subq       #SPRySPD,d0                                        ; Subtract from the position
+
+                cmp.w      #$2c,d0                                            ; Top of screen
+                ble        .tst_down                                          ; No more upward movement
+
+                add.w      d0,d1                                              ; Screen position
+
+                move.b     d0,spr_data                                        ; y position into control word
+                move.b     d1,spr_data+2                                      ; Finish of sprite into control word
+                move.w     d0,spr_yPos                                        ; Save our new position		
+
 .tst_down		
                 btst       #1,d7                                              ; Down
                 beq        .tst_left
 
                 move.w     #$0FF0,COLOR00(a5)
-		
+
+                ; Sprite control words to be adjusted/edited
+                ;move.w     spr_yPos,d0                                        ; Current y position
+                ;move.w     #sprheight,d1                                      ; Height of the sprite
+               
+                addq       #SPRySPD,d0                                        ; Add to the position
+
+                cmp.w      #$af,d0                                            ; Bottom of screen
+                bgt        .tst_left                                          ; No more downward movement
+                ;bgt        .xyz
+                
+                add.w      d0,d1                                              ; Screen position
+
+                move.b     d0,spr_data                                        ; y position into control word
+                move.b     d1,spr_data+2                                      ; Finish of sprite into control word
+                move.w     d0,spr_yPos                                        ; Save our new position
+                
+.xyz
+                move.w     #$0135,COLOR00(a5)                
 .tst_left
                 btst       #2,d7                                              ; Left
                 beq        .tst_right
 
                 move.w     #$00FF,COLOR00(a5)
+
+                ; Sprite control words to be adjusted/edited
+                ;move.w     spr_xPos,d2                                        ; Current sprite position
+                subq       #SPRxSPD,d2                                        ; Move left by 1
+
+                cmp.w      #$40,d2                                            ; Left edge, do nothing
+                ble        .tst_right
+
+                move.b     d2,spr_data+1
+                move.w     d2,spr_xPos
 		
 .tst_right
                 btst       #3,d7                                              ; Right
                 beq        .tst_fire1
 
                 move.w     #$0F0F,COLOR00(a5)
-                clr.l      d0
-                clr.l      d1
-                clr.l      d2
-                clr.l      d3
 
                 ; Sprite control words to be adjusted/edited
-                move.w     spr_xPos,d0
-                move.w     spr_yPos,d1
+                ;move.w     spr_xPos,d2                                        
+                cmp.w      #$cf,d2
+                bhi        .tst_fire1
 
-                move.b     #sprheight,d2
-                add.b      d1,d2
-                move.w     d2,d3
-                addq       #1,d0
-
-                move.b     d0,spr_data+1
-                move.b     d1,spr_data
-                move.b     d2,spr_data+2
-
-
-;move.w SpriteXPosition,d0
-;move.w d0,d1
-;and.w #1,d1
-;lsr.w #1,d0
-;move.b d0,SpriteData+1
-;move.b d1,SpriteData+3
-
-                jsr        AnimateSprite
-                ;move.b     d1,spr_data+3  
-                
+                addq       #SPRxSPD,d2
+                move.b     d2,spr_data+1
+                move.w     d2,spr_xPos
 
 .tst_fire1
                 btst       #8,d7                                              ; Fire 1
@@ -433,6 +465,7 @@ spr3copaddr:    dc.l       0
 spr_xPos        dc.w       $40
 spr_yPos        dc.w       $2C
 spr_cur_frame:  dc.b       0
+                even
 spr_data        dc.w       $2C40,$8200                                        ; Control words for sprite
 
                 even
