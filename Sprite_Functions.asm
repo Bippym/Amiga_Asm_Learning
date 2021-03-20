@@ -41,7 +41,7 @@ MoveSprite:
 
     bra        .1                   ; Back to the start
 
-;Setspriteframe:
+Setspriteframe:
             ; set the next animation frame
             ; a2 -> pointer to next frame to display
 
@@ -78,12 +78,12 @@ AnimateSprite:
     moveq      #0,d2
     moveq      #0,d3
 
-    move.l     #spr_data,d4         ; Control word into d4
-
+    lea        spr_data,a2          ; Control word into d4
+    move.l     (a2),d4
 
 
               ; Get address of first sprite
-    move.b     #4-1,d3              ; Num of sprites to make a frame
+    move.b     #2-1,d3              ; Num of sprites to make a frame
     move.l     spr0copaddr,a0       ; Location of the first sprite in the copperlist ($0120xxxx)
     move.b     spr_cur_frame,d0     ; What frame are we on?
     move.w     #sprskip,d1          ; Number of sprites to skip
@@ -100,8 +100,33 @@ AnimateSprite:
     swap       d2
     move.w     d2,(a0)+             ; Pop into the copper and advance to next sprite pointer
     move.l     #sprsize,d1          ; Size of 1 sprite
-    ;bchg       #7,d4                ; toggle the atached bit
+
+
+    ; Attached sprite 
+    bchg       #7,d4                ; toggle the attached bit
+
+    add.l      #$2,a0               ; Next sprite address
+    add.l      d1,a1                ; Point to the first sprite of the next frame
+    move.l     d4,(a1)              ; Pop in new position to control word 
+    move.l     a1,d2                ; Address of sprite
+    swap       d2                   ; Get the high word
+    move.w     d2,(a0)+             ; Pop address into the copper
+    add.l      #$2,a0               ; Get the low word
+    swap       d2
+    move.w     d2,(a0)+             ; Pop into the copper and advance to next sprite pointer
+    move.l     #sprsize,d1          ; Size of 1 sprite
+    bchg       #7,d4                ; toggle the atached bit
+
+    add.l      #$00080000,d4        ; Sprite offset
     dbf        d3,.1                ; Loop to next sprite
+
+
+
+
+
+
+
+
     addq       #1,d0
 
                 ; Check if we are on the last frame, if so we go back to the first frame

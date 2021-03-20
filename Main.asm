@@ -121,7 +121,7 @@ wframe2:
                 beq        mwait
                 bsr        ReadInput
 
-                ; Test MOVEMENT
+Controller:     ; Test MOVEMENT
                 ; Registers used by this routine
 
                 ; d0 - Sprite Y position
@@ -161,7 +161,7 @@ wframe2:
                
                 addq       #SPRySPD,d0                                        ; Add to the position
 
-                cmp.w      #$af,d0                                            ; Bottom of screen
+                cmp.w      #$cf,d0                                            ; Bottom of screen
                 bgt        .tst_left                                          ; No more downward movement
                 ;bgt        .xyz
                 
