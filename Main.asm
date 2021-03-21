@@ -107,14 +107,14 @@ start:
 
 MAINLOOP:
 
-wframe:
+.wframe
                 btst       #0,$dff005
-                bne.b      wframe
+                bne.b      .wframe
                 cmp.b      #$2a,$dff006
-                bne.b      wframe
-wframe2:
+                bne.b      .wframe
+.wframe2
                 cmp.b      #$2a,$dff006
-                beq.b      wframe2
+                beq.b      .wframe2
 
 
                 btst       #6,$BFE001
@@ -156,22 +156,37 @@ Controller:     ; Test MOVEMENT
                 move.w     #$0FF0,COLOR00(a5)
 
                 ; Sprite control words to be adjusted/edited
-                ;move.w     spr_yPos,d0                                        ; Current y position
-                ;move.w     #sprheight,d1                                      ; Height of the sprite
-               
-                addq       #SPRySPD,d0                                        ; Add to the position
+                move.w     spr_yPos,d0                                        ; Current y position
+                move.w     #sprheight,d1                                      ; Height of the sprite
 
-                cmp.w      #$cf,d0                                            ; Bottom of screen
-                bgt        .tst_left                                          ; No more downward movement
-                ;bgt        .xyz
-                
-                add.w      d0,d1                                              ; Screen position
+                moveq      #0,d3
+                addq.b     #SPRySPD,d0                                        ; Add to the position
+                bcc        .ok2
+                move.w     spr_yPos,d0
+                addq.b     #SPRySPD,d0
+                or.w       #2,d3                                              ; set vstart highbit
+                ;cmp.w      #$ff,d0                                            ; Bottom of screen
+                ;bgt        .tst_left                                          ; No more downward movement
+                                
+                ;move.l     #240,d1
+                ;move.l     #10,d0
 
+.ok2            
+
+                add.b      d0,d1                                              ; Screen position
+                bcc        .ok
+                or.w       #1,d3                                              ; vstop highbit
+
+                ;bra        .tst_left
+
+.ok              
                 move.b     d0,spr_data                                        ; y position into control word
+                ;move.b     xx,SPR0CTL
                 move.b     d1,spr_data+2                                      ; Finish of sprite into control word
+                move.b     d3,spr_data+3
+
                 move.w     d0,spr_yPos                                        ; Save our new position
-                
-.xyz
+
                 move.w     #$0135,COLOR00(a5)                
 .tst_left
                 btst       #2,d7                                              ; Left
@@ -487,3 +502,7 @@ myimage:
                 cnop       0,8
                 incbin     "BippyM.pic"
                 even
+
+REPTEX: 
+                dc.w       (($40&$FF)<<8)|(($40&$1FE)>>1)
+               ; DC.W       (((spr_yPos+sprheight)&$FF)<<8)!((spr_yPos &$100)>>6)!(((spr_yPos+sprheight)&$100)>>7)!(spr_xPos&$1)
