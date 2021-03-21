@@ -127,15 +127,17 @@ Controller:     ; Test MOVEMENT
                 ; d0 - Sprite Y position
                 ; d1 - Sprite height
                 ; d2 - Sprite X position
+                ; d3 - Scratch register used for vstart/vstop carry over control bits
+                ; a0 - Points to our control words
 
                 move.w     spr_yPos,d0
                 move.w     spr_xPos,d2
                 move.w     #sprheight,d1
+                moveq      #0,d3
+                lea        spr_data,a0
 
 .tst_up         btst       #0,d7                                              ; Up
                 beq        .tst_down
-
-                move.w     #$0,COLOR00(a5)
 
                 ; Sprite control words to be adjusted/edited
                 subq       #SPRySPD,d0                                        ; Subtract from the position
@@ -143,51 +145,41 @@ Controller:     ; Test MOVEMENT
                 cmp.w      #$2c,d0                                            ; Top of screen
                 ble        .tst_down                                          ; No more upward movement
 
+                ; Test if we are near the bottom of the screen.
+                ; Screen height - sprite height
+
                 add.w      d0,d1                                              ; Screen position
 
-                move.b     d0,spr_data                                        ; y position into control word
-                move.b     d1,spr_data+2                                      ; Finish of sprite into control word
+                move.b     d0,(a0)                                            ; y position into control word
+                move.b     d1,2(a0)                                           ; Finish of sprite into control word
                 move.w     d0,spr_yPos                                        ; Save our new position		
 
 .tst_down		
                 btst       #1,d7                                              ; Down
                 beq        .tst_left
 
-                move.w     #$0FF0,COLOR00(a5)
-
                 ; Sprite control words to be adjusted/edited
                 move.w     spr_yPos,d0                                        ; Current y position
                 move.w     #sprheight,d1                                      ; Height of the sprite
 
-                moveq      #0,d3
                 addq.b     #SPRySPD,d0                                        ; Add to the position
-                bcc        .ok2
-                move.w     spr_yPos,d0
-                addq.b     #SPRySPD,d0
-                or.w       #2,d3                                              ; set vstart highbit
-                ;cmp.w      #$ff,d0                                            ; Bottom of screen
-                ;bgt        .tst_left                                          ; No more downward movement
-                                
-                ;move.l     #240,d1
-                ;move.l     #10,d0
+                bcc        .dn1                                               ; Carry bit set as >$FF
+                or.w       #4,d3                                              ; set vstart highbit
 
-.ok2            
-
+                cmp.w      #$ff,d0                                            ; Test for bottom of screen
+                ble        .tst_left                                          ; Yep we are at the bottom
+.dn1            
                 add.b      d0,d1                                              ; Screen position
-                bcc        .ok
-                or.w       #1,d3                                              ; vstop highbit
+                bcc        .dn2
+                or.w       #2,d3                                              ; vstop highbit
 
-                ;bra        .tst_left
-
-.ok              
-                move.b     d0,spr_data                                        ; y position into control word
-                ;move.b     xx,SPR0CTL
-                move.b     d1,spr_data+2                                      ; Finish of sprite into control word
                 move.b     d3,spr_data+3
+.dn2              
+                move.b     d0,(a0)                                            ; y position into control word
+                move.b     d1,2(a0)                                           ; Finish of sprite into control word
 
-                move.w     d0,spr_yPos                                        ; Save our new position
+                move.w     d0,spr_yPos                                        ; Save our new position 
 
-                move.w     #$0135,COLOR00(a5)                
 .tst_left
                 btst       #2,d7                                              ; Left
                 beq        .tst_right
@@ -201,22 +193,19 @@ Controller:     ; Test MOVEMENT
                 cmp.w      #$40,d2                                            ; Left edge, do nothing
                 ble        .tst_right
 
-                move.b     d2,spr_data+1
+                move.b     d2,1(a0)
                 move.w     d2,spr_xPos
 		
 .tst_right
                 btst       #3,d7                                              ; Right
                 beq        .tst_fire1
 
-                move.w     #$0F0F,COLOR00(a5)
-
                 ; Sprite control words to be adjusted/edited
-                ;move.w     spr_xPos,d2                                        
                 cmp.w      #$cf,d2
                 bhi        .tst_fire1
 
                 addq       #SPRxSPD,d2
-                move.b     d2,spr_data+1
+                move.b     d2,1(a0)
                 move.w     d2,spr_xPos
 
 .tst_fire1
