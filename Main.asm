@@ -44,7 +44,7 @@ SCREEN_DEPTH   equ 4
 ; Therefore each sprite is $160*4 
 
 sprheight      equ 86
-sprsize        equ (sprheight*4)+8                                            ; Bytes to skip to next sprite (sprheight*bytesperline+controlwords)
+sprsize        equ (sprheight*4)+8                                                       ; Bytes to skip to next sprite (sprheight*bytesperline+controlwords)
 sprskip        equ sprsize*4
 
 SPRxSPD        equ 1
@@ -69,28 +69,28 @@ old_Clist1_off equ 38
 old_Clist2_off equ 50
 
 start:
-                movem.l    d1-d7/a0-a6,-(sp)                                  ; Preserve registers
+                movem.l    d1-d7/a0-a6,-(sp)                                             ; Preserve registers
 
-                move.l     $4,a6                                              ; execbase
-                lea        $DFF000,a5                                         ; custom base
+                move.l     $4,a6                                                         ; execbase
+                lea        $DFF000,a5                                                    ; custom base
 	
 	; Allocate ram for copperlist
                 move.l     #1024,d0
                 move.l     #MEMF_CHIP,d1
                 jsr        _LVOAllocMem(a6)
-                move.l     d0,copperlist                                      ; save copperlist address
+                move.l     d0,copperlist                                                 ; save copperlist address
 	
 	; Load gfx library first and get the system copperlist
-                clr.l      d0                                                 ; any version
-                move.l     #gfxname,a1                                        ; gfx library
-                jsr        _LVOOpenLibrary(a6)                                ; openlibrary
-                tst.l      d0                                                 ; base address, or 0 for failure
+                clr.l      d0                                                            ; any version
+                move.l     #gfxname,a1                                                   ; gfx library
+                jsr        _LVOOpenLibrary(a6)                                           ; openlibrary
+                tst.l      d0                                                            ; base address, or 0 for failure
                 beq        exit
-                move.l     d0,gfxbase                                         ; save gfx lib base address
+                move.l     d0,gfxbase                                                    ; save gfx lib base address
 	
 	; Save the system copperlist
-                move.l     d0,a1                                              ; Gfxlib base address
-                move.l     old_Clist1_off(a1),sys1cop                         ; save the copperlist
+                move.l     d0,a1                                                         ; Gfxlib base address
+                move.l     old_Clist1_off(a1),sys1cop                                    ; save the copperlist
                 move.l     old_Clist2_off(a1),sys2cop
                 move.l     old_View_off(a1),sysview
 
@@ -100,10 +100,10 @@ start:
 
 	; Now setup my system
                 move.w     #$87e0,DMACON(a5)
-                move.w     #$C010,INTENA(a5)                                  ; Vertical blank, and master enable	
+                move.w     #$C010,INTENA(a5)                                             ; Vertical blank, and master enable	
 
-                move.l     copperlist,COP1LCH(a5)                             ; pop my copperlist in
-                move.w     #0,COPJMP1(a5)                                     ; Initiate copper
+                move.l     copperlist,COP1LCH(a5)                                        ; pop my copperlist in
+                move.w     #0,COPJMP1(a5)                                                ; Initiate copper
 
 MAINLOOP:
 
@@ -120,102 +120,17 @@ MAINLOOP:
                 btst       #6,$BFE001
                 beq        mwait
                 bsr        ReadInput
-
-Controller:     ; Test MOVEMENT
-                ; Registers used by this routine
-
-                ; d0 - Sprite Y position
-                ; d1 - Sprite height
-                ; d2 - Sprite X position
-                ; d3 - Scratch register used for vstart/vstop carry over control bits
-                ; a0 - Points to our control words
-
-                move.w     spr_yPos,d0
-                move.w     spr_xPos,d2
-                move.w     #sprheight,d1
-                moveq      #0,d3
-                lea        spr_data,a0
-
-.tst_up         btst       #0,d7                                              ; Up
-                beq        .tst_down
-
-                ; Sprite control words to be adjusted/edited
-                subq       #SPRySPD,d0                                        ; Subtract from the position
-
-                cmp.w      #$2c,d0                                            ; Top of screen
-                ble        .tst_down                                          ; No more upward movement
-
-                ; Test if we are near the bottom of the screen.
-                ; Screen height - sprite height
-
-                add.w      d0,d1                                              ; Screen position
-
-                move.b     d0,(a0)                                            ; y position into control word
-                move.b     d1,2(a0)                                           ; Finish of sprite into control word
-                move.w     d0,spr_yPos                                        ; Save our new position		
-
-.tst_down		
-                btst       #1,d7                                              ; Down
-                beq        .tst_left
-
-                ; Sprite control words to be adjusted/edited
-                move.w     spr_yPos,d0                                        ; Current y position
-                move.w     #sprheight,d1                                      ; Height of the sprite
-
-                addq.b     #SPRySPD,d0                                        ; Add to the position
-                bcc        .dn1                                               ; Carry bit set as >$FF
-                or.w       #4,d3                                              ; set vstart highbit
-
-                cmp.w      #$ff,d0                                            ; Test for bottom of screen
-                ble        .tst_left                                          ; Yep we are at the bottom
-.dn1            
-                add.b      d0,d1                                              ; Screen position
-                bcc        .dn2
-                or.w       #2,d3                                              ; vstop highbit
-
-                move.b     d3,spr_data+3
-.dn2              
-                move.b     d0,(a0)                                            ; y position into control word
-                move.b     d1,2(a0)                                           ; Finish of sprite into control word
-
-                move.w     d0,spr_yPos                                        ; Save our new position 
-
-.tst_left
-                btst       #2,d7                                              ; Left
-                beq        .tst_right
-
-                move.w     #$00FF,COLOR00(a5)
-
-                ; Sprite control words to be adjusted/edited
-                ;move.w     spr_xPos,d2                                        ; Current sprite position
-                subq       #SPRxSPD,d2                                        ; Move left by 1
-
-                cmp.w      #$40,d2                                            ; Left edge, do nothing
-                ble        .tst_right
-
-                move.b     d2,1(a0)
-                move.w     d2,spr_xPos
-		
-.tst_right
-                btst       #3,d7                                              ; Right
-                beq        .tst_fire1
-
-                ; Sprite control words to be adjusted/edited
-                cmp.w      #$cf,d2
-                bhi        .tst_fire1
-
-                addq       #SPRxSPD,d2
-                move.b     d2,1(a0)
-                move.w     d2,spr_xPos
+                bsr        updateSpriteCoordinates
+                bsr        updateSpriteWords
 
 .tst_fire1
-                btst       #8,d7                                              ; Fire 1
+                btst       #8,d7                                                         ; Fire 1
                 beq        .tst_fire2
 
                 bra        mwait
 		
 .tst_fire2
-                btst       #9,d7                                              ; Fire 2
+                btst       #9,d7                                                         ; Fire 2
                 beq        .done
 
 .done
@@ -223,8 +138,8 @@ Controller:     ; Test MOVEMENT
                 bra        MAINLOOP
               
 mwait:	
-                beq        restoresys
-                rts              
+;                beq        restoresys
+;                rts              
 
 restoresys:
 	; Restore the system
@@ -245,18 +160,18 @@ restoresys:
                 move.l     gfxbase,a0
                 move.l     sysview,a1
 	
-                jsr        loadview(a6)                                       ; Restore the original view
+                jsr        loadview(a6)                                                  ; Restore the original view
 	
-                move.l     a0,d0                                              ; GFXBase ready for closing
-                MOVE.l     $4,A6                                              ; Execbase
-                jsr        permit(a6)                                         ; Enable multitasking
+                move.l     a0,d0                                                         ; GFXBase ready for closing
+                MOVE.l     $4,A6                                                         ; Execbase
+                jsr        permit(a6)                                                    ; Enable multitasking
 	
 exit:
-                jsr        closelibrary(a6)                                   ; Close gfx library
+                jsr        closelibrary(a6)                                              ; Close gfx library
 	
-                movem.l    (sp)+,d1-d7/a0-a6                                  ; Restore registers
-                move.l     #0,d0                                              ; Ensure d0 is cleared
-                rts                                                           ; exit
+                movem.l    (sp)+,d1-d7/a0-a6                                             ; Restore registers
+                move.l     #0,d0                                                         ; Ensure d0 is cleared
+                rts                                                                      ; exit
 
 ; -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-
 
@@ -270,10 +185,10 @@ exit:
 setnewcop:
 
                 movem.l    d0-d7/a0-a1,-(sp)
-                move.l     copperlist,a0                                      ; address of our copperlist
-                move.l     #FMODE<<16+0,(a0)+                                 ; Set FMODE into copperlist
+                move.l     copperlist,a0                                                 ; address of our copperlist
+                move.l     #FMODE<<16+0,(a0)+                                            ; Set FMODE into copperlist
                 move.w     #BPLCON0,(a0)+
-                move.w     #$4200,(a0)+                                       ; Lowres 4bpp screen 010000100000000
+                move.w     #$4200,(a0)+                                                  ; Lowres 4bpp screen 010000100000000
                 move.w     #BPLCON1,(a0)+
                 move.w     #0,(a0)+
                 move.w     #BPLCON2,(a0)+
@@ -283,82 +198,82 @@ setnewcop:
                 move.w     #BPL2MOD,(a0)+
                 move.w     #(SCREEN_WIDTH/8)*(SCREEN_DEPTH-1),(a0)+
                 move.l     #DIWSTRT<<16+$2c81,(a0)+
-                move.l     #DIWSTOP<<16+$2cc1,(a0)+                           ; f4c1/2c
+                move.l     #DIWSTOP<<16+$2cc1,(a0)+                                      ; f4c1/2c
                 ;move.l     #DIWSTOP<<16+$38c1,(a0)+                           ; PAL offset > 256
                 move.l     #DDFSTRT<<16+$0038,(a0)+
                 move.l     #DDFSTOP<<16+$00D0,(a0)+
 
-                lea        myimage,a1                                         ; My image address
-.loop           cmp.l      #"BODY",(a1)                                       ; We need to search for the body of the image
-                beq.s      .found                                             ; Have we found it? Branch if so
-                addq       #2,a1                                              ; Not found, so lets increment and try again
+                lea        myimage,a1                                                    ; My image address
+.loop           cmp.l      #"BODY",(a1)                                                  ; We need to search for the body of the image
+                beq.s      .found                                                        ; Have we found it? Branch if so
+                addq       #2,a1                                                         ; Not found, so lets increment and try again
                 bra.s      .loop
 
 
-.found          addq       #8,a1                                              ; Move past the BODY header
+.found          addq       #8,a1                                                         ; Move past the BODY header
 
-                moveq      #SCREEN_DEPTH-1,d7                                 ; Number of bitplanes
+                moveq      #SCREEN_DEPTH-1,d7                                            ; Number of bitplanes
 	
-                move.l     #(BPL0PTH<<16),d0                                  ; Bitplane high pointer to $00E00000
-.1              move.l     a1,d1                                              ; Address of image copied
-                swap       d1                                                 ; swap the address round so the high word is moveable
-                move.w     d1,d0                                              ; and move it into d0 (d0 = $00E0xxxx)
-                move.l     d0,(a0)+                                           ; Pop it into the copperlist
-                swap       d1                                                 ; Swap the address back
-                add.l      #$20000,d0                                         ; move to the BPLxPTL
-                move.w     d1,d0                                              ; Low part of the address in
-                move.l     d0,(a0)+                                           ; ANd pop the address into the copper
-                add.l      #$20000,d0                                         ; Next BPLxPTH (next bitplane)
-                add.l      #(SCREEN_WIDTH/8),a1                               ; Next bitplane image
-                dbf        d7,.1                                              ; loop
+                move.l     #(BPL0PTH<<16),d0                                             ; Bitplane high pointer to $00E00000
+.1              move.l     a1,d1                                                         ; Address of image copied
+                swap       d1                                                            ; swap the address round so the high word is moveable
+                move.w     d1,d0                                                         ; and move it into d0 (d0 = $00E0xxxx)
+                move.l     d0,(a0)+                                                      ; Pop it into the copperlist
+                swap       d1                                                            ; Swap the address back
+                add.l      #$20000,d0                                                    ; move to the BPLxPTL
+                move.w     d1,d0                                                         ; Low part of the address in
+                move.l     d0,(a0)+                                                      ; ANd pop the address into the copper
+                add.l      #$20000,d0                                                    ; Next BPLxPTH (next bitplane)
+                add.l      #(SCREEN_WIDTH/8),a1                                          ; Next bitplane image
+                dbf        d7,.1                                                         ; loop
 
 
 ; Finds the palette within the IFF and sets the palette registers
 
 SetPalette:
 
-                lea        myimage,a1                                         ; Image into a1 again to search for the palette	
-.loop           cmp.l      #"CMAP",(a1)                                       ; Looking for the colormap
-                beq        .found                                             ; Have we found the colormap
-                addq       #2,a1                                              ; Not found, move on :)
+                lea        myimage,a1                                                    ; Image into a1 again to search for the palette	
+.loop           cmp.l      #"CMAP",(a1)                                                  ; Looking for the colormap
+                beq        .found                                                        ; Have we found the colormap
+                addq       #2,a1                                                         ; Not found, move on :)
                 bra.s      .loop
 	
-.found          addq       #8,a1                                              ; Jump over the header
+.found          addq       #8,a1                                                         ; Jump over the header
 
-                move.l     #SCREEN_DEPTH<<2-1,d7                              ; Number of colours in the image
+                move.l     #SCREEN_DEPTH<<2-1,d7                                         ; Number of colours in the image
 	
                 clr.l      d4
                 clr.l      d3
                 clr.l      d2
                 clr.l      d1
 	
-                move.l     #(COLOR00<<16),d5                                  ; First colour entry
-.2              move.b     (a1)+,d1                                           ; Red 
-                move.b     (a1)+,d2                                           ; Green
-                move.b     (a1)+,d3                                           ; Blue
+                move.l     #(COLOR00<<16),d5                                             ; First colour entry
+.2              move.b     (a1)+,d1                                                      ; Red 
+                move.b     (a1)+,d2                                                      ; Green
+                move.b     (a1)+,d3                                                      ; Blue
 	
-                and.b      #%11110000,d1                                      ; Drop lower nibble
+                and.b      #%11110000,d1                                                 ; Drop lower nibble
                 and.b      #%11110000,d2
                 and.b      #%11110000,d3	
-                move.b     d1,d5                                              ; Move red
-                lsl.w      #4,D5                                              ; Shift to the left
-                or.w       D2,D5                                              ; Move green in
-                lsl.w      #4,D5                                              ; ANd shift
-                or.w       D3,D5                                              ; Move in blue
-                lsr.w      #4,d5                                              ; fix the offset
+                move.b     d1,d5                                                         ; Move red
+                lsl.w      #4,D5                                                         ; Shift to the left
+                or.w       D2,D5                                                         ; Move green in
+                lsl.w      #4,D5                                                         ; ANd shift
+                or.w       D3,D5                                                         ; Move in blue
+                lsr.w      #4,d5                                                         ; fix the offset
 	
-                move.l     d5,(a0)+                                           ; Put the colour register into the copperlist
+                move.l     d5,(a0)+                                                      ; Put the colour register into the copperlist
 	
-                add.l      #$20000,d5                                         ; Next colour register
-                dbf        d7,.2                                              ; Loop
+                add.l      #$20000,d5                                                    ; Next colour register
+                dbf        d7,.2                                                         ; Loop
 
               ; Set Palette entries 16-31 for the sprites
-                move.l     #16-1,d7                                           ; No' Colours
-                lea        SpritePal,a1                                       ; Address of sprite colours
-                move.l     #(COLOR16<<16),d0                                  ; Palette 16
-.4              move.w     (a1)+,d0                                           ; colour copied
-                move.l     d0,(a0)+                                           ; Pop it into the copperlist
-                add.l      #$20000,d0                                         ; move to the SPR0PTL
+                move.l     #16-1,d7                                                      ; No' Colours
+                lea        SpritePal,a1                                                  ; Address of sprite colours
+                move.l     #(COLOR16<<16),d0                                             ; Palette 16
+.4              move.w     (a1)+,d0                                                      ; colour copied
+                move.l     d0,(a0)+                                                      ; Pop it into the copperlist
+                add.l      #$20000,d0                                                    ; move to the SPR0PTL
                 dbf        d7,.4
 
 
@@ -372,73 +287,185 @@ SetPalette:
              ; Set sprite pointers into registers
 SetSprite:
               ; left half of the owl. Sprite 0
-                move.l     a0,spr0copaddr                                     ; Offset to the sprite copper address
-                move.l     #8-4,d7                                            ; Number of sprites (8 - the attached sprites 0/1 and 2/3)
+                move.l     a0,spr0copaddr                                                ; Offset to the sprite copper address
+                move.l     #8-4,d7                                                       ; Number of sprites (8 - the attached sprites 0/1 and 2/3)
 
-                lea        Sprite1a,a1                                        ; Sprite address
-                move.l     #(SPR0PTH<<16),d0                                  ; Sprite high pointer $01020000
-                move.l     a1,d1                                              ; Address of sprite copied
-                swap       d1                                                 ; swap the address round so the high word is moveable
-                move.w     d1,d0                                              ; and move it into d0 (d0 = $0102xxxx)
-                move.l     d0,(a0)+                                           ; Pop it into the copperlist
-                swap       d1                                                 ; Swap the address back
-                add.l      #$20000,d0                                         ; move to the SPR0PTL
-                move.w     d1,d0                                              ; Low part of the address in
-                move.l     d0,(a0)+                                           ; And pop the address into the copper
+                lea        Sprite1a,a1                                                   ; Sprite address
+                move.l     #(SPR0PTH<<16),d0                                             ; Sprite high pointer $01020000
+                move.l     a1,d1                                                         ; Address of sprite copied
+                swap       d1                                                            ; swap the address round so the high word is moveable
+                move.w     d1,d0                                                         ; and move it into d0 (d0 = $0102xxxx)
+                move.l     d0,(a0)+                                                      ; Pop it into the copperlist
+                swap       d1                                                            ; Swap the address back
+                add.l      #$20000,d0                                                    ; move to the SPR0PTL
+                move.w     d1,d0                                                         ; Low part of the address in
+                move.l     d0,(a0)+                                                      ; And pop the address into the copper
 
               ; Sprite 1, attached
-                move.l     a0,spr1copaddr                                     ; Save attached sprite address
-                lea        Sprite1b,a1                                        ; Attach sprite location
-                move.l     #(SPR1PTH<<16),d0                                  ; Sprite 1 high pointer
-                move.l     a1,d1                                              ; Address of sprite copied
-                swap       d1                                                 ; swap the address round so the high word is moveable
-                move.w     d1,d0                                              ; and move it into d0 (d0 = $0102xxxx)
-                move.l     d0,(a0)+                                           ; Pop it into the copperlist
-                swap       d1                                                 ; Swap the address back
-                add.l      #$20000,d0                                         ; move to the SPRxPTL
-                move.w     d1,d0                                              ; Low part of the address in
-                move.l     d0,(a0)+                                           ; And pop the address into the copper
+                move.l     a0,spr1copaddr                                                ; Save attached sprite address
+                lea        Sprite1b,a1                                                   ; Attach sprite location
+                move.l     #(SPR1PTH<<16),d0                                             ; Sprite 1 high pointer
+                move.l     a1,d1                                                         ; Address of sprite copied
+                swap       d1                                                            ; swap the address round so the high word is moveable
+                move.w     d1,d0                                                         ; and move it into d0 (d0 = $0102xxxx)
+                move.l     d0,(a0)+                                                      ; Pop it into the copperlist
+                swap       d1                                                            ; Swap the address back
+                add.l      #$20000,d0                                                    ; move to the SPRxPTL
+                move.w     d1,d0                                                         ; Low part of the address in
+                move.l     d0,(a0)+                                                      ; And pop the address into the copper
 
               ; Right half of the owl Sprite 2
-                move.l     a0,spr2copaddr                                     ; Save attached sprite address
-                lea        Sprite2a,a1                                        ; Attach sprite location
-                move.l     #(SPR2PTH<<16),d0                                  ; Sprite 1 high pointer
-                move.l     a1,d1                                              ; Address of sprite copied
-                swap       d1                                                 ; swap the address round so the high word is moveable
-                move.w     d1,d0                                              ; and move it into d0 (d0 = $0102xxxx)
-                move.l     d0,(a0)+                                           ; Pop it into the copperlist
-                swap       d1                                                 ; Swap the address back
-                add.l      #$20000,d0                                         ; move to the SPRxPTL
-                move.w     d1,d0                                              ; Low part of the address in
-                move.l     d0,(a0)+                                           ; And pop the address into the copper
+                move.l     a0,spr2copaddr                                                ; Save attached sprite address
+                lea        Sprite2a,a1                                                   ; Attach sprite location
+                move.l     #(SPR2PTH<<16),d0                                             ; Sprite 1 high pointer
+                move.l     a1,d1                                                         ; Address of sprite copied
+                swap       d1                                                            ; swap the address round so the high word is moveable
+                move.w     d1,d0                                                         ; and move it into d0 (d0 = $0102xxxx)
+                move.l     d0,(a0)+                                                      ; Pop it into the copperlist
+                swap       d1                                                            ; Swap the address back
+                add.l      #$20000,d0                                                    ; move to the SPRxPTL
+                move.w     d1,d0                                                         ; Low part of the address in
+                move.l     d0,(a0)+                                                      ; And pop the address into the copper
 
               ; Sprite 2, attached
-                move.l     a0,spr3copaddr                                     ; Save attached sprite address
-                lea        Sprite2b,a1                                        ; Attach sprite location
-                move.l     #(SPR3PTH<<16),d0                                  ; Sprite 1 high pointer
-.3              move.l     a1,d1                                              ; Address of sprite copied
-                swap       d1                                                 ; swap the address round so the high word is moveable
-                move.w     d1,d0                                              ; and move it into d0 (d0 = $0102xxxx)
-                move.l     d0,(a0)+                                           ; Pop it into the copperlist
-                swap       d1                                                 ; Swap the address back
-                add.l      #$20000,d0                                         ; move to the SPRxPTL
-                move.w     d1,d0                                              ; Low part of the address in
-                move.l     d0,(a0)+                                           ; And pop the address into the copper
+                move.l     a0,spr3copaddr                                                ; Save attached sprite address
+                lea        Sprite2b,a1                                                   ; Attach sprite location
+                move.l     #(SPR3PTH<<16),d0                                             ; Sprite 1 high pointer
+.3              move.l     a1,d1                                                         ; Address of sprite copied
+                swap       d1                                                            ; swap the address round so the high word is moveable
+                move.w     d1,d0                                                         ; and move it into d0 (d0 = $0102xxxx)
+                move.l     d0,(a0)+                                                      ; Pop it into the copperlist
+                swap       d1                                                            ; Swap the address back
+                add.l      #$20000,d0                                                    ; move to the SPRxPTL
+                move.w     d1,d0                                                         ; Low part of the address in
+                move.l     d0,(a0)+                                                      ; And pop the address into the copper
 
-                move.b     #1,spr_cur_frame                                   ; Set the initial animation frame
+                move.b     #1,spr_cur_frame                                              ; Set the initial animation frame
 
 
               ; Set the null sprites for the remaining 6 sprites
-                add.l      #$20000,d0                                         ; next SPRxPTH
-                lea        NullSpr,a1                                         ; pointer to the null sprite data
-                dbf        d7,.3                                              ; loop
+                add.l      #$20000,d0                                                    ; next SPRxPTH
+                lea        NullSpr,a1                                                    ; pointer to the null sprite data
+                dbf        d7,.3                                                         ; loop
 
-                move.l     #$FFFFFFFE,(a0)                                    ; End the copperlist
+                move.l     #$FFFFFFFE,(a0)                                               ; End the copperlist
                 movem.l    (sp)+,d0-d7/a0-a1
 
                 rts
 	
-	
+speedSpriteX        :	equ	2
+speedSpriteY        :	equ	4
+
+screenLeftBoundary  :	equ	$40
+screenRightBoundary :	equ	$cc
+screenTopBoundary   :	equ	$2c
+screenBottomBoundary:	equ	$f0
+
+;	Up		-	   1
+;	Down		-	   2
+;	Left		-	   4
+;	Right		-	   8
+
+; d7=bit field of movement
+updateSpriteCoordinates:
+                move.w     spr_yPos,d0
+                move.w     spr_xPos,d2
+                move.w     #sprheight,d1
+                clr.l      d4
+                move.b     d7,d4
+               ; and.l      #%0000000000001111,d7
+
+                lea        .moves(pc),a3
+                add.b      d4,d4
+                add.b      d4,d4
+                add.w      d4,a3
+                move.l     (a3),a3
+                jmp        (a3)
+
+
+.none:          bra        .exit
+
+.left:          cmp.w      #screenLeftBoundary,d2
+                blt.s      .exit
+                subq.w     #speedSpriteX,d2
+                bra.s      .update
+		
+.right:         cmp.w      #screenRightBoundary,d2
+                bgt.s      .exit
+                addq.w     #speedSpriteX,d2
+                bra.s      .update
+		
+.up:            cmp.w      #screenTopBoundary,d0
+                blt.s      .exit
+                subq.w     #speedSpriteY,d0
+                bra.s      .update
+
+.down:          cmp.w      #screenBottomBoundary,d0
+                bgt.s      .exit
+                addq.w     #speedSpriteY,d0
+                bra.s      .update
+
+.up_left:       bsr.s      .up
+                bsr.s      .left
+                bra.s      .update
+		
+.up_right:      bsr.s      .up
+                bsr.s      .right
+                bra.s      .update
+		
+.down_left:     bsr.s      .down
+                bsr.s      .left
+                bra.s      .update
+		
+.down_right:    bsr.s      .down
+                bsr.s      .right
+                bra.s      .update
+		
+                nop
+
+.update         move.w     d2,spr_xPos 
+                move.w     d0,spr_yPos 
+.exit:          rts
+
+                           ;0    4   8     12    16    20       24         28
+.moves:         dc.l       .none,.up,.down,.none,.left,.up_left,.down_left,.none
+                dc.l       .right,.up_right,.down_right,.none,.none,.none,.none,.none
+                           ;32    36         40         44    48    52     56    60
+
+
+; Test MOVEMENT
+; Registers used by this routine
+
+; d0 - Sprite Y position
+; d1 - Sprite height
+; d2 - Sprite X position
+updateSpriteWords:
+                move.l     d3,-(a7)                                                      ; Save d3 cos we trash it
+                moveq      #0,d3
+		
+                btst       #8,d0                                                         ; Y Position above 255?
+                beq.s      .vstart                                                       ; No....
+                or.w       #4,d3                                                         ; Yes, set vstart highbit
+
+.vstart:        add.w      d0,d1                                                         ; calc sprite height position
+                btst       #8,d1                                                         ; Bottom above 255?
+                beq.s      .vstop                                                        ; No....
+                or.w       #2,d3                                                         ; Yes.. so set vstop highbit
+
+.vstop:              						
+
+		; Update control words
+                move.b     d0,spr_data                                                   ; y position into control word
+                move.b     d1,spr_data+2                                                 ; Finish of sprite into control word
+                move.b     d2,spr_data+1
+                move.b     d3,spr_data+3                                                 ; Set high bits if needed
+                move.l     (a7)+,d3                                                      ; Restore d3
+                rts
+
+
+
+
+
 ;***********************************************************************************************
 	
                 SECTION    coplistexample,DATA_C
@@ -451,9 +478,9 @@ gfxname:
 gfxbase:
                 dc.l       0
                 even
-sys1cop:        dc.l       0                                                  ; System copperlist
-sys2cop:        dc.l       0                                                  ; System copperlist2
-sysview:        dc.l       0                                                  ; Systemview
+sys1cop:        dc.l       0                                                             ; System copperlist
+sys2cop:        dc.l       0                                                             ; System copperlist2
+sysview:        dc.l       0                                                             ; Systemview
 
 ; Below we have sprite information, this includes variables for saving the various sprite
 ; memory locations within the copperlist. This will allow us to update the copperlist dynamically
@@ -461,16 +488,16 @@ sysview:        dc.l       0                                                  ; 
 
 ; Sprite Data
 
-spr0copaddr:    dc.l       0                                                  ; Address within copperlist to adjust sprite pointer
+spr0copaddr:    dc.l       0                                                             ; Address within copperlist to adjust sprite pointer
 spr1copaddr:    dc.l       0
-spr2copaddr:    dc.l       0                                                  ; Address within copperlist to adjust sprite pointer
+spr2copaddr:    dc.l       0                                                             ; Address within copperlist to adjust sprite pointer
 spr3copaddr:    dc.l       0
 
 spr_xPos        dc.w       $40
 spr_yPos        dc.w       $2C
 spr_cur_frame:  dc.b       0
                 even
-spr_data        dc.w       $2C40,$8200                                        ; Control words for sprite
+spr_data        dc.w       $2C40,$8200                                                   ; Control words for sprite
 
                 even
 
